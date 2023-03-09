@@ -126,7 +126,7 @@ class DataWindow:
                 for period in periods:
                     rfm = self.__calculateRFM(period)
                     ex.addRfm(rfm)
-                # Inserisce l' esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
+                # Inserisce l'esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
                 self.__examples.insertExample(cw.getKMember(), ex)
                 # Verifica se il cliente attuale ha acquistato nel currentDay
                 if cw.getLastReceipt().date() == self.__currentDay:
