@@ -6,7 +6,9 @@
 """
 
 from Rfm import Rfm
+from RfmR import RfmR
 import datetime as dt
+import statistics as st
 
 class Example:
     # Attributi privati:
@@ -77,3 +79,55 @@ class Example:
         ex.__generationTimeStamp = self.__generationTimeStamp
         ex.__labelTimeStamp = self.__labelTimeStamp
         return ex
+
+    def getMax(self):
+        recency = list(map(lambda obj: obj.getRecency(), self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
+
+        maxR = max(recency)
+        maxF = max(frequency)
+        maxM = max(monetary)
+
+        maximum = Rfm(maxR, maxF, maxM)
+
+        return maximum
+    
+    def getMin(self):
+        recency = list(map(lambda obj: obj.getRecency(), self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
+
+        minR = min(recency)
+        minF = min(frequency)
+        minM = min(monetary)
+
+        minimum = Rfm(minR, minF, minM)
+
+        return minimum
+    
+    def getMean(self):
+        recency = list(map(lambda obj: obj.getRecency(), self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
+
+        meanR = st.mean(recency)
+        meanF = st.mean(frequency)
+        meanM = st.mean(monetary)
+
+        mean = RfmR(meanR, meanF, meanM)
+
+        return mean
+    
+    def getStandardDeviation(self):
+        recency = list(map(lambda obj: obj.getRecency(), self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
+
+        stdeviationR = st.stdev(recency)
+        stdeviationF = st.stdev(frequency)
+        stdeviationM = st.stdev(monetary)
+
+        standardDeviation = Rfm(stdeviationR, stdeviationF, stdeviationM)
+
+        return standardDeviation

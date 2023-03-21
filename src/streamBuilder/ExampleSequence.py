@@ -46,5 +46,13 @@ class ExampleSequence:
                 frequency = rfm.getFrequency()
                 monetary = rfm.getMonetary()
                 row += [recency, frequency, monetary]
+            maximum = example.getMax()
+            minimum = example.getMin()
+            mean = example.getMean()
+            standardDeviation = example.getStandardDeviation()
+            row += [maximum.getRecency(), maximum.getFrequency(), maximum.getMonetary()]
+            row += [minimum.getRecency(), minimum.getFrequency(), minimum.getMonetary()]
+            row += [mean.getRecency(), mean.getFrequency(), mean.getMonetary()]
+            row += [standardDeviation.getRecency(), standardDeviation.getFrequency(), standardDeviation.getMonetary()]
             row += [example.getLabelTimestamp(), label]
             toFill.append(row)
