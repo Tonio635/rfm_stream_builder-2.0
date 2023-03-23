@@ -85,6 +85,17 @@ class Example:
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
         monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
 
+        recency = list(map(lambda obj: obj.getRecency()
+                       if obj.getRecency() != -1 else None, self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency()
+                         if obj.getRecency() != -1 else None, self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary()
+                        if obj.getRecency() != -1 else None, self.__desc))
+
+        recency = list(filter(lambda obj: obj is not None, recency))
+        frequency = list(filter(lambda obj: obj is not None, frequency))
+        monetary = list(filter(lambda obj: obj is not None, monetary))
+
         maxR = max(recency)
         maxF = max(frequency)
         maxM = max(monetary)
@@ -97,6 +108,17 @@ class Example:
         recency = list(map(lambda obj: obj.getRecency(), self.__desc))
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
         monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
+
+        recency = list(map(lambda obj: obj.getRecency()
+                       if obj.getRecency() != -1 else None, self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency()
+                         if obj.getRecency() != -1 else None, self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary()
+                        if obj.getRecency() != -1 else None, self.__desc))
+
+        recency = list(filter(lambda obj: obj is not None, recency))
+        frequency = list(filter(lambda obj: obj is not None, frequency))
+        monetary = list(filter(lambda obj: obj is not None, monetary))
 
         minR = min(recency)
         minF = min(frequency)
@@ -111,6 +133,17 @@ class Example:
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
         monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
 
+        recency = list(map(lambda obj: obj.getRecency()
+                       if obj.getRecency() != -1 else None, self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency()
+                         if obj.getRecency() != -1 else None, self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary()
+                        if obj.getRecency() != -1 else None, self.__desc))
+
+        recency = list(filter(lambda obj: obj is not None, recency))
+        frequency = list(filter(lambda obj: obj is not None, frequency))
+        monetary = list(filter(lambda obj: obj is not None, monetary))
+
         meanR = st.mean(recency)
         meanF = st.mean(frequency)
         meanM = st.mean(monetary)
@@ -124,10 +157,28 @@ class Example:
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
         monetary = list(map(lambda obj: obj.getMonetary(), self.__desc))
 
-        stdeviationR = st.stdev(recency)
-        stdeviationF = st.stdev(frequency)
-        stdeviationM = st.stdev(monetary)
+        recency = list(map(lambda obj: obj.getRecency()
+                       if obj.getRecency() != -1 else None, self.__desc))
+        frequency = list(map(lambda obj: obj.getFrequency()
+                         if obj.getRecency() != -1 else None, self.__desc))
+        monetary = list(map(lambda obj: obj.getMonetary()
+                        if obj.getRecency() != -1 else None, self.__desc))
 
-        standardDeviation = Rfm(stdeviationR, stdeviationF, stdeviationM)
+        recency = list(filter(lambda obj: obj is not None, recency))
+        frequency = list(filter(lambda obj: obj is not None, frequency))
+        monetary = list(filter(lambda obj: obj is not None, monetary))
+
+        rfmSize = len(recency)
+
+        if rfmSize > 1:
+            stdeviationR = st.stdev(recency)
+            stdeviationF = st.stdev(frequency)
+            stdeviationM = st.stdev(monetary)
+        else:
+            stdeviationR = 0.0
+            stdeviationF = 0.0
+            stdeviationM = 0.0
+
+        standardDeviation = RfmR(stdeviationR, stdeviationF, stdeviationM)
 
         return standardDeviation
