@@ -93,7 +93,7 @@ class Main:
 
         # SERIALIZZAZIONE MODELLO
         if input("Vuoi serializzare il modello? (y/n)") == 'y':
-            learner.toPickle('serialized_models', input("Inserire nome file:"))
+            learner.toPickle('serialized_models/offline', input("Inserire nome file:"))
 
 
 parser = argparse.ArgumentParser()

@@ -23,7 +23,7 @@ class RfmR:
 
     """
         Metodo getter attributo Recency.
-        Return di un tipo int.
+        Return di un tipo float.
     """
 
     def getRecency(self):
@@ -31,7 +31,7 @@ class RfmR:
 
     """
         Metodo getter attributo Frequency.
-        Return di un tipo int.
+        Return di un tipo float.
     """
 
     def getFrequency(self):
