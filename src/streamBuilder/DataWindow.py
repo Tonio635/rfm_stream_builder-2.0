@@ -32,10 +32,12 @@ class DataWindow:
             - examples: dizionario che conterrà gli esempi in attesa di essere etichettati;
             - window: dizionario <k, v> dove k = K_Member e v = customerWindow di quel cliente.
     """
-    def __init__(self, periodDim: int, periods: int, churnDim: int):
+    def __init__(self, periodDim: int, periods: int, churnDim: int, k: int, type: int):
         self.__churnDim = churnDim
         self.__periodDim: int = periodDim
         self.__periods: int = periods
+        self.__k: int = k
+        self.__type: int = type
         self.__windowDim: int = max(periodDim * periods, churnDim)
         self.__currentDay: dt.date = None
         self.__examples: ExampleDictionary = ExampleDictionary()
@@ -56,7 +58,11 @@ class DataWindow:
             # Scandisce la lista di tuple
             for row in data:
                 receiptLines = []
-                i = 0
+                keys = list(Receipt.categories.keys())
+                if len(keys) < 1:
+                    i = 0
+                else:
+                    i = keys[-1] + 1
                 for line in row[6]:
                     if line[0] not in Receipt.categories.values():
                         Receipt.categories[i] = line[0]
@@ -137,26 +143,35 @@ class DataWindow:
                 for period in periods:
                     rfm = self.__calculateRFM(period)
                     ex.addRfm(rfm)
+                purchasedToday = cw.getLastReceipt().date() == self.__currentDay
+                if not purchasedToday:
+                    categories = [-1] * self.__k
+                    ex.setTopCategories(categories)
+                # Accesso all'ultimo elemento della DataWindow attraverso l'operatore 'itemgetter' della libreria
+                # operator per controllare qualora vi siano più ricevute relative al currentDay
+                day = operator.itemgetter(-1)(cw.getListOfDays())
+                if day is not None:
+                    receipts = day.getReceiptsOfDay()
+                    receipts.reverse()
+                    ex.setTopCategories(receipts[0].getTopFrequentCategories(self.__k, self.__type))
+                    ex.setNumDistinctCategories(receipts[0].getNumDistinctCategories())
                 # Inserisce l'esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
                 self.__examples.insertExample(cw.getKMember(), ex)
                 # Verifica se il cliente attuale ha acquistato nel currentDay
-                if cw.getLastReceipt().date() == self.__currentDay:
-                    # Accesso all'ultimo elemento della DataWindow attraverso l'operatore 'itemgetter' della libreria
-                    # operator per controllare qualora vi siano più ricevute relative al currentDay
-                    day = operator.itemgetter(-1)(cw.getListOfDays())
-                    receipts = day.getReceiptsOfDay()
+                if purchasedToday:
                     # Se nel Day ci sono più ricevute
                     if len(receipts) > 1:
                         # Instanziazione dell'ExampleSequence che conterrà gli esempi da etichettare immediatamente
                         seq = ExampleSequence()
-                        # Ciclo sulle ricevute del giorno partendo dall'ultima.Questo ci permetterà di scandire una sola
+                        # Ciclo sulle ricevute del giorno partendo dall'ultima. Questo ci permetterà di scandire una sola
                         # volta il periodo per il calcolo RFM. Per le ricevute precedenti all'ultima, il calcolo viene
                         # effettuato per sottrazione.
-                        receipts.reverse()
                         oldMonetary = receipts[0].getQAmount()
                         for receipt in receipts[1:]:
                             rfm = Rfm(rfm.getRecency(), rfm.getFrequency() - 1, rfm.getMonetary() - oldMonetary)
                             newExample = ex.copy()
+                            newExample.setTopCategories(receipt.getTopFrequentCategories(self.__k, self.__type))
+                            newExample.setNumDistinctCategories(receipt.getNumDistinctCategories())
                             newExample.replaceLastRfm(rfm)
                             newExample.setLabelTimestamp(receipt.getTReceipt())
                             seq.appendExample(newExample.copy())
