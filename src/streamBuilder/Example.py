@@ -23,6 +23,8 @@ class Example:
         self.__generationTimeStamp = generationTimeStamp
         self.__labelTimeStamp = None
         self.__desc = []
+        self.__topCategories = []
+        self.__numDistinctCategories = 0
     
     """
         Metodo getter StartTimeStamp.
@@ -32,7 +34,7 @@ class Example:
         return self.__generationTimeStamp
 
     """
-        Metodo setter per generationTimeSTamp
+        Metodo setter per generationTimeStamp
     """
     def setGenerationTimeStamp(self, timestamp):
         self.__generationTimeStamp = timestamp
@@ -71,15 +73,21 @@ class Example:
         self.__labelTimeStamp = timestamp
 
     """
-           Metodo che effettua la copia. 
+        Metodo che effettua la copia. 
     """
     def copy(self):
         ex = Example(None)
         ex.__desc = self.__desc.copy()
         ex.__generationTimeStamp = self.__generationTimeStamp
         ex.__labelTimeStamp = self.__labelTimeStamp
+        ex.__topCategories = self.__topCategories.copy()
+        ex.__numDistinctCategories = self.__numDistinctCategories
         return ex
 
+    """
+        Metodo per ottenere il massimo tra i valori degli RFM dei vari periodi.
+        Return di un tipo Rfm.
+    """
     def getMax(self):
         recency = list(map(lambda obj: obj.getRecency(), self.__desc))
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
@@ -104,6 +112,10 @@ class Example:
 
         return maximum
     
+    """
+        Metodo per ottenere il minimo tra i valori degli RFM dei vari periodi.
+        Return di un tipo Rfm.
+    """
     def getMin(self):
         recency = list(map(lambda obj: obj.getRecency(), self.__desc))
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
@@ -128,6 +140,10 @@ class Example:
 
         return minimum
     
+    """
+        Metodo per ottenere la media tra i valori degli RFM dei vari periodi.
+        Return di un tipo RfmR.
+    """
     def getMean(self):
         recency = list(map(lambda obj: obj.getRecency(), self.__desc))
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
@@ -152,6 +168,10 @@ class Example:
 
         return mean
     
+    """
+        Metodo per ottenere la deviazione standard tra i valori degli RFM dei vari periodi.
+        Return di un tipo RfmR.
+    """
     def getStandardDeviation(self):
         recency = list(map(lambda obj: obj.getRecency(), self.__desc))
         frequency = list(map(lambda obj: obj.getFrequency(), self.__desc))
@@ -182,3 +202,29 @@ class Example:
         standardDeviation = RfmR(stdeviationR, stdeviationF, stdeviationM)
 
         return standardDeviation
+
+    """
+        Metodo getter per topCategories.
+        Return di una lista di int.
+    """
+    def getTopCategories(self):
+        return self.__topCategories
+    
+    """
+        Metodo setter per topCategories.
+    """
+    def setTopCategories(self, topCategories):
+        self.__topCategories = topCategories
+    
+    """
+        Metodo getter per numDistinctCategories.
+        Return di un tipo int.
+    """
+    def getNumDistinctCategories(self):
+        return self.__numDistinctCategories
+    
+    """
+        Metodo setter per numDistinctCategories.
+    """
+    def setNumDistinctCategories(self, numDistinctCategories):
+        self.__numDistinctCategories = numDistinctCategories
