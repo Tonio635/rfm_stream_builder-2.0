@@ -54,6 +54,12 @@ class DBConnector:
         cursor.execute("SELECT * FROM Receipts WHERE DATE(T_Receipt) = %s ORDER BY K_Member, T_Receipt ASC",
                        [gg.isoformat()])
         rows = cursor.fetchall()
+        
+        for i in range(len(rows)):
+            cursor.execute("SELECT D_Product, Quantity, Q_Amount, Q_Discount_Amount FROM Receipt_Lines, Products WHERE %s = K_Receipt AND Receipt_Lines.K_Product = Products.K_Product", [rows[i][0]])
+            lines = cursor.fetchall()
+            rows[i] = rows[i] + (lines,)
+            
         return rows
 
     """
