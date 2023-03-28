@@ -5,7 +5,6 @@
 // Description : La classe Receipt modella la singola entry della tabella Receipt del DB.
                  Essa contiene tutti i campi della tabella Receipt come attributi e relativi metodi get e set.
 """
-from ReceiptLine import ReceiptLine
 
 class Receipt:
 

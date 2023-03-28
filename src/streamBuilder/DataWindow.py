@@ -18,6 +18,7 @@ from Example import Example
 from ExampleDictionary import ExampleDictionary
 from Receipt import Receipt
 from Rfm import Rfm
+from ReceiptLine import ReceiptLine
 
 
 class DataWindow:
@@ -54,6 +55,16 @@ class DataWindow:
 
             # Scandisce la lista di tuple
             for row in data:
+                receiptLines = []
+                i = 0
+                for line in row[6]:
+                    if line[0] not in Receipt.categories.values():
+                        Receipt.categories[i] = line[0]
+                        receiptLines.append(ReceiptLine(i, line[1], line[2], line[3]))
+                        i += 1
+                    else:
+                        reverse_dict = {v: k for k, v in Receipt.categories.items()}
+                        receiptLines.append(ReceiptLine(reverse_dict[line[0]], line[1], line[2], line[3]))
                 # Confronta l'attuale 'K_Member' con oldMember. Se non siamo ancora sulle sue ricevute
                 if row[1] != oldMember:
                     # Costruisce il Day passando come oggetto la lista di receipts
@@ -68,7 +79,7 @@ class DataWindow:
                         self.__window[oldMember] = cw
                     # Svuotiamo la lista di receipts e la inizializziamo con la Receipt del nuovo cliente
                     receipts = [
-                        Receipt(row[0], row[1], row[2], row[3], row[4], row[5])
+                        Receipt(row[0], row[1], row[2], row[3], row[4], row[5], receiptLines)
                     ]
                     # Salviamo il suo ultimo acquisto
                     lastPurchase = row[5]
@@ -76,7 +87,7 @@ class DataWindow:
                     oldMember = row[1]
                 # Se siamo ancora tra le receipts di oldMember, aggiungiamo la receipt alla lista
                 else:
-                    receipts.append(Receipt(row[0], row[1], row[2], row[3], row[4], row[5]))
+                    receipts.append(Receipt(row[0], row[1], row[2], row[3], row[4], row[5], receiptLines))
                     lastPurchase = row[5]
 
             # L'ultimo cliente non sarà mai precedente di nessuno, viene aggiunto a prescindere
