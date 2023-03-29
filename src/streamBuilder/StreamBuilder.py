@@ -34,11 +34,13 @@ class StreamBuilder:
             - periods: numero di periodi, di tipo int;
             - start: data di partenza, di default la prima del db;
             - end: data di fine, di default l'ultima del db;
-            - outputFolder: percorso della cartella output dove vengono salvati i pickle.
+            - outputFolder: percorso della cartella output dove vengono salvati i pickle;
+            - numTop: numero di categorie che devono essere presenti nella top categorie;
+            - type: valore su cui si deve basare la top categorie.
         Inizializza la DataWindow e richiama il metodo privato generateStream().
     """
     def __init__(self, host: str, username: str, password: str, databaseName: str,
-                 churnDim: int, periodDim: int, periods: int, start: dt.date = None,
+                 churnDim: int, periodDim: int, periods: int, numTop: int, type: int, start: dt.date = None,
                  end: dt.date = None):
         self.__outputFolder = Path("./../../output")
         if None in [host, username, password, databaseName, churnDim, periodDim, periods]:
@@ -51,7 +53,7 @@ class StreamBuilder:
         except mysql.connector.errors.ProgrammingError:
             raise ValueError("Connessione al db fallita, controllare che i parametri siano corretti")
 
-        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim)
+        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim, numTop, type)
         self.__generateStream(start, end)
 
     """
@@ -120,6 +122,11 @@ parser.add_argument('--database', help='Il nome del database a cui si desidera c
 parser.add_argument('--churnDim', help='Dimensione del churn, di tipo int.', type=int)
 parser.add_argument('--periodDim', help='Dimensione del periodo, di tipo int.', type=int)
 parser.add_argument('--periods', help='Numero di periodi, di tipo int.', type=int)
+parser.add_argument('--numTop', help='Numero di categorie presenti in top categorie, di tipo int.', type=int)
+parser.add_argument('--type', help='Parametro su cui si deve basare la top categorie, di tipo int.\
+                    type = 1: top categorie in base a Quantity\
+                    type = 2: top categorie in base a Q_Amount\
+                    type = 3: top categorie in base a Q_Discount_Amount.', type=int)
 parser.add_argument('--start', help='Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db.',
                     default=None)
 parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l\'ultima del db.',
@@ -127,6 +134,6 @@ parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONAL
 args = parser.parse_args()
 try:
     StreamBuilder(args.host, args.user, args.password, args.database, args.churnDim, args.periodDim, args.periods,
-                  args.start, args.end)
+                  args.numTop, args.type, args.start, args.end)
 except ValueError as err:
     print('\033[91m' + str(err))
