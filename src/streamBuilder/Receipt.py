@@ -9,6 +9,7 @@
 class Receipt:
 
     categories: dict[int, str] = {}
+    numCategories: int
 
     """
         Metodo costruttore. Inizializza gli attributi privati della classe con i valori passati in input.
@@ -72,17 +73,17 @@ class Receipt:
         return self.__T_Receipt
     
     """
-        Metodo finalizzato ad ottenere le top k categorie della ricevuta in base ad un type specifico.
-        type = 1: top categorie in base a Quantity
-        type = 2: top categorie in base a Q_Amount
-        type = 3: top categorie in base a Q_Discount_Amount
-        Return di una lista di interi.
+        Metodo finalizzato ad ottenere una lista delle categorie della ricevuta in base ad un type specifico.
+        type = 1: in base a Quantity
+        type = 2: in base a Q_Amount
+        type = 3: base a Q_Discount_Amount
+        Return di una lista.
     """
-    def getTopFrequentCategories(self, k, type):
+    def getInfoCategories(self, type):
         # creazione di un dizionario per mantenere la somma delle quantità/qamount/qdiscountamount per ogni categoria
         categories_count = {}
 
-        if type == 1:           # top categorie in base alla quantity
+        if type == 1:           # categorie in base alla quantity
             for line in self.__lines:
                 category_id = line.getCategoryID()
                 quantity = line.getQuantity()
@@ -90,7 +91,7 @@ class Receipt:
                     categories_count[category_id] += quantity
                 else:
                     categories_count[category_id] = quantity
-        elif type == 2:         # top categorie in base alla q_amount
+        elif type == 2:         # categorie in base alla q_amount
             for line in self.__lines:
                 category_id = line.getCategoryID()
                 q_amount = line.getQAmount()
@@ -98,7 +99,7 @@ class Receipt:
                     categories_count[category_id] += q_amount
                 else:
                     categories_count[category_id] = q_amount
-        elif type == 3:         # top categorie in base alla q_discount_amount
+        elif type == 3:         # categorie in base alla q_discount_amount
             for line in self.__lines:
                 category_id = line.getCategoryID()
                 q_discount_amount = line.getQDiscountAmount()
@@ -108,22 +109,22 @@ class Receipt:
                     categories_count[category_id] = q_discount_amount
         else:
             return None
+
+        info_categories = []
+
+        keys_categories = Receipt.categories.keys()
+        keys_categories_count = categories_count.keys()
+
+        for key in keys_categories:
+            if key in keys_categories_count:
+                info_categories += [categories_count[key]]
+            else:
+                info_categories += [0]
         
-        # ordinamento del dizionario in ordine decrescente in base alla somma
-        sorted_categories = sorted(
-            categories_count.items(), key=lambda x: x[1], reverse=True)
+        while(len(info_categories) < Receipt.numCategories[0]):
+            info_categories += [0]
 
-        # restituzione dei primi k elementi del dizionario come lista di interi
-        top_k_categories = [category[0] for category in sorted_categories[:k]]
-
-        i = len(top_k_categories)
-
-        # se non ci sono sufficienti categorie, si riempiono gli spazi rimasti con "-1"
-        while i < k:
-           top_k_categories.append(-1)
-           i += 1
-
-        return top_k_categories
+        return info_categories
 
     """
         Metodo finalizzato ad ottenere il numero distinto di categorie presenti nella ricevuta.
