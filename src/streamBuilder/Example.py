@@ -23,7 +23,7 @@ class Example:
         self.__generationTimeStamp = generationTimeStamp
         self.__labelTimeStamp = None
         self.__desc = []
-        self.__topCategories = []
+        self.__infoCategories = []
         self.__numDistinctCategories = 0
     
     """
@@ -80,7 +80,7 @@ class Example:
         ex.__desc = self.__desc.copy()
         ex.__generationTimeStamp = self.__generationTimeStamp
         ex.__labelTimeStamp = self.__labelTimeStamp
-        ex.__topCategories = self.__topCategories.copy()
+        ex.__infoCategories = self.__infoCategories.copy()
         ex.__numDistinctCategories = self.__numDistinctCategories
         return ex
 
@@ -204,17 +204,17 @@ class Example:
         return standardDeviation
 
     """
-        Metodo getter per topCategories.
+        Metodo getter per infoCategories.
         Return di una lista di int.
     """
-    def getTopCategories(self):
-        return self.__topCategories
+    def getInfoCategories(self):
+        return self.__infoCategories
     
     """
-        Metodo setter per topCategories.
+        Metodo setter per infoCategories.
     """
-    def setTopCategories(self, topCategories):
-        self.__topCategories = topCategories
+    def setInfoCategories(self, infoCategories):
+        self.__infoCategories = infoCategories
     
     """
         Metodo getter per numDistinctCategories.
