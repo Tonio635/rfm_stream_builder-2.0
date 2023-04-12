@@ -10,7 +10,7 @@
 """
 
 import mysql.connector
-
+from Receipt import Receipt
 
 class DBConnector:
     __mydb = mysql.connector.MySQLConnection()
@@ -59,7 +59,9 @@ class DBConnector:
             cursor.execute("SELECT D_Product, Quantity, Q_Amount, Q_Discount_Amount FROM Receipt_Lines, Products WHERE %s = K_Receipt AND Receipt_Lines.K_Product = Products.K_Product", [rows[i][0]])
             lines = cursor.fetchall()
             rows[i] = rows[i] + (lines,)
-            
+        
+        cursor.execute("SELECT COUNT(DISTINCT Products.D_Product) FROM Receipt_Lines, Products WHERE Receipt_Lines.K_Product = Products.K_Product")
+        Receipt.numCategories = cursor.fetchone()
         return rows
 
     """
@@ -73,8 +75,8 @@ class DBConnector:
         return rows[0][0]
 
     """
-            Metodo che effettua la query per estrarre l'ultima data del DB.
-            MAX perchè è la data più recente di tutto il DB.
+        Metodo che effettua la query per estrarre l'ultima data del DB.
+        MAX perchè è la data più recente di tutto il DB.
     """
     def extractLastDay(self):
         cursor = self.__mydb.cursor()
