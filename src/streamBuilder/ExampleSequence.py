@@ -54,9 +54,7 @@ class ExampleSequence:
             row += [minimum.getRecency(), minimum.getFrequency(), minimum.getMonetary()]
             row += [mean.getRecency(), mean.getFrequency(), mean.getMonetary()]
             row += [standardDeviation.getRecency(), standardDeviation.getFrequency(), standardDeviation.getMonetary()]
-            topCategories = example.getTopCategories()
-            for i in range(len(topCategories)):
-                row += [topCategories[i]]
+            row += example.getInfoCategories()
             row += [example.getNumDistinctCategories()]
             row += [example.getLabelTimestamp(), label]
             toFill.append(row)
