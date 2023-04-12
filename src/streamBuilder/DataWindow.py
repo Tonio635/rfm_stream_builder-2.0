@@ -31,14 +31,12 @@ class DataWindow:
             - currentDay: giorno attuale;
             - examples: dizionario che conterrà gli esempi in attesa di essere etichettati;
             - window: dizionario <k, v> dove k = K_Member e v = customerWindow di quel cliente;
-            - numTop: numero di categorie che devono essere presenti nella top categorie;
-            - type: valore su cui si deve basare la top categorie.
+            - type: valore su cui si deve basare la lista categorie.
     """
-    def __init__(self, periodDim: int, periods: int, churnDim: int, numTop: int, type: int):
+    def __init__(self, periodDim: int, periods: int, churnDim: int, type: int):
         self.__churnDim = churnDim
         self.__periodDim: int = periodDim
         self.__periods: int = periods
-        self.__numTop: int = numTop
         self.__type: int = type
         self.__windowDim: int = max(periodDim * periods, churnDim)
         self.__currentDay: dt.date = None
@@ -147,15 +145,15 @@ class DataWindow:
                     ex.addRfm(rfm)
                 purchasedToday = cw.getLastReceipt().date() == self.__currentDay
                 if not purchasedToday:
-                    categories = [-1] * self.__numTop
-                    ex.setTopCategories(categories)
+                    categories = [0] * Receipt.numCategories[0]
+                    ex.setInfoCategories(categories)
                 # Accesso all'ultimo elemento della DataWindow attraverso l'operatore 'itemgetter' della libreria
                 # operator per controllare qualora vi siano più ricevute relative al currentDay
                 day = operator.itemgetter(-1)(cw.getListOfDays())
                 if day is not None:
                     receipts = day.getReceiptsOfDay()
                     receipts.reverse()
-                    ex.setTopCategories(receipts[0].getTopFrequentCategories(self.__numTop, self.__type))
+                    ex.setInfoCategories(receipts[0].getInfoCategories(self.__type))
                     ex.setNumDistinctCategories(receipts[0].getNumDistinctCategories())
                 # Inserisce l'esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
                 self.__examples.insertExample(cw.getKMember(), ex)
@@ -172,7 +170,7 @@ class DataWindow:
                         for receipt in receipts[1:]:
                             rfm = Rfm(rfm.getRecency(), rfm.getFrequency() - 1, rfm.getMonetary() - oldMonetary)
                             newExample = ex.copy()
-                            newExample.setTopCategories(receipt.getTopFrequentCategories(self.__numTop, self.__type))
+                            newExample.setInfoCategories(receipt.getInfoCategories(self.__type))
                             newExample.setNumDistinctCategories(receipt.getNumDistinctCategories())
                             newExample.replaceLastRfm(rfm)
                             newExample.setLabelTimestamp(receipt.getTReceipt())
