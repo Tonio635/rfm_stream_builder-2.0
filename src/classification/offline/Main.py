@@ -9,6 +9,7 @@ import os
 import matplotlib.pyplot as plt
 import scikitplot as skplt
 import argparse
+import datetime
 
 from sklearn.metrics import accuracy_score, classification_report
 from src.classification.offline.OfflineLearner import OfflineLearner
@@ -74,11 +75,17 @@ class Main:
 
         # Stabiliamo percentuale Train Set
         train_percentage = int((len(files) * 70) / 100)
+        
+        date_obj = datetime.datetime.strptime(files[3], '%Y-%m-%d')
+        new_date_obj = date_obj.replace(year=date_obj.year + 1)
+        new_date_str = datetime.datetime.strftime(new_date_obj, '%Y-%m-%d')
+        
+        train_end_index = files.index(new_date_str)
 
         # loader per il train che va da start a 70% (esempio) dove start può essere passato in input
-        train_loader = PickleLoader(self.STREAMFOLDERPATH, files, start=files[0], end=files[train_percentage])
+        train_loader = PickleLoader(self.STREAMFOLDERPATH, files, start=files[0], end=files[train_end_index])
         # loader per il test che va da 70% a end dove end può essere passato in input
-        test_loader = PickleLoader(self.STREAMFOLDERPATH, files, start=files[train_percentage + 1], end=files[-1])
+        test_loader = PickleLoader(self.STREAMFOLDERPATH, files, start=files[train_end_index + 1], end=files[-1])
 
         # TRAIN
         print("Training:")
