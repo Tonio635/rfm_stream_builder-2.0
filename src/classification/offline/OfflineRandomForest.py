@@ -19,7 +19,7 @@ class OfflineRandomForest(OfflineClassifierInterface):
         Richiama il costruttore di linear_model.RandomForestClassifier()
     """
     def __init__(self):
-        self.__model = ensemble.RandomForestClassifier()
+        self.__model = ensemble.RandomForestClassifier(random_state=42)
 
     """
         Metodo learn che prende in input:

@@ -8,7 +8,7 @@ class OfflineXGBoost(OfflineClassifierInterface):
         Richiama il costruttore di XGBClassifier
     """
     def __init__(self):
-        self.__model = XGBClassifier()
+        self.__model = XGBClassifier(random_state = 42)
     
     """
         Metodo learn che prende in input:
