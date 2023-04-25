@@ -25,6 +25,9 @@ class ExampleSequence:
     def appendExample(self, ex: Example):
         self.__examples.append(ex)
 
+    def getExample(self, pos: int):
+        return self.__examples[pos]
+
     """
         Metodo setter per il labelTimeStamp degli examples in ExampleSequence
     """
@@ -54,7 +57,18 @@ class ExampleSequence:
             row += [minimum.getRecency(), minimum.getFrequency(), minimum.getMonetary()]
             row += [mean.getRecency(), mean.getFrequency(), mean.getMonetary()]
             row += [standardDeviation.getRecency(), standardDeviation.getFrequency(), standardDeviation.getMonetary()]
-            row += example.getInfoCategories()
-            row += [example.getNumDistinctCategories()]
+            prodRfm = example.getProductRfm()
+            minimum = example.getProductsMin()
+            maximum = example.getProductsMax()
+            mean = example.getProductsMean()
+            standardDeviation = example.getProductsStandardDeviation()
+            
+            for i in range(len(prodRfm)):
+                for j in range(len(prodRfm[i])):
+                    row += [prodRfm[i][j].getRecency(), prodRfm[i][j].getRecency(), prodRfm[i][j].getMonetary()]
+                row += [maximum[i].getRecency(), maximum[i].getFrequency(), maximum[i].getMonetary()]
+                row += [minimum[i].getRecency(), minimum[i].getFrequency(), minimum[i].getMonetary()]
+                row += [mean[i].getRecency(), mean[i].getFrequency(), mean[i].getMonetary()]
+                row += [standardDeviation[i].getRecency(), standardDeviation[i].getFrequency(), standardDeviation[i].getMonetary()]
             row += [example.getLabelTimestamp(), label]
             toFill.append(row)
