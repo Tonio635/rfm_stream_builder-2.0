@@ -39,7 +39,7 @@ class StreamBuilder:
         Inizializza la DataWindow e richiama il metodo privato generateStream().
     """
     def __init__(self, host: str, username: str, password: str, databaseName: str,
-                 churnDim: int, periodDim: int, periods: int, type: int, start: dt.date = None,
+                 churnDim: int, periodDim: int, periods: int, level: int, start: dt.date = None,
                  end: dt.date = None):
         self.__outputFolder = Path("./../../output")
         if None in [host, username, password, databaseName, churnDim, periodDim, periods]:
@@ -52,23 +52,25 @@ class StreamBuilder:
         except mysql.connector.errors.ProgrammingError:
             raise ValueError("Connessione al db fallita, controllare che i parametri siano corretti")
 
-        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim, type)
-        self.__generateStream(start, end)
+        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim)
+        self.__generateStream(start, end, level)
 
     """
         Metodo per la generazione ed etichettatura di esempi. Infine serializziamo gli esempi in un pickle.
     """
-    def __generateStream(self, start: str, end: str):
+    def __generateStream(self, start: str, end: str, level: int):
         currentDay = self.__mydb.extractFirstDay() if start is None else dt.date.fromisoformat(start)
         lastDay = self.__mydb.extractLastDay() if end is None else dt.date.fromisoformat(end)
+        mapping = self.__mydb.extractProductHierarchy(level)
+        categories = mapping.getDistinctCategories()
         with alive_bar((lastDay-currentDay).days, force_tty=True) as bar:
             while currentDay != lastDay:
                 examplesOfDay = []
-                dataOfDay = self.__mydb.extractReceipts(currentDay)
+                dataOfDay = self.__mydb.extractReceipts(currentDay, mapping)
                 self.__window.deleteFurthestDay()
                 self.__window.set(dataOfDay, currentDay)
-                self.__window.generateLabels(examplesOfDay)
-                self.__window.generateExamplesLabelsForMulReceipts(examplesOfDay)  # and labels on multiple receipts
+                oldProductRfm = self.__window.generateLabels(examplesOfDay)
+                self.__window.generateExamplesLabelsForMulReceipts(examplesOfDay, categories, oldProductRfm)  # and labels on multiple receipts
                 self.__window.clean()
                 self.__insertLabeledExamples(examplesOfDay, currentDay)
                 currentDay += dt.timedelta(days=1)
@@ -121,10 +123,7 @@ parser.add_argument('--database', help='Il nome del database a cui si desidera c
 parser.add_argument('--churnDim', help='Dimensione del churn, di tipo int.', type=int)
 parser.add_argument('--periodDim', help='Dimensione del periodo, di tipo int.', type=int)
 parser.add_argument('--periods', help='Numero di periodi, di tipo int.', type=int)
-parser.add_argument('--type', help='Parametro su cui si deve basare la lista di categorie, di tipo int.\
-                    type = 1: top categorie in base a Quantity\
-                    type = 2: top categorie in base a Q_Amount\
-                    type = 3: top categorie in base a Q_Discount_Amount.', type=int)
+parser.add_argument('--level', help='Livello di gerarchia delle categorie da utilizzare.', type=int)
 parser.add_argument('--start', help='Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db.',
                     default=None)
 parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l\'ultima del db.',
@@ -132,6 +131,6 @@ parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONAL
 args = parser.parse_args()
 try:
     StreamBuilder(args.host, args.user, args.password, args.database, args.churnDim, args.periodDim, args.periods,
-                  args.type, args.start, args.end)
+                  args.level, args.start, args.end)
 except ValueError as err:
     print('\033[91m' + str(err))
