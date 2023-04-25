@@ -8,9 +8,6 @@
 
 class Receipt:
 
-    categories: dict[int, str] = {}
-    numCategories: int
-
     """
         Metodo costruttore. Inizializza gli attributi privati della classe con i valori passati in input.
             - K_Receipt: id della receipt, di tipo str;
@@ -73,63 +70,20 @@ class Receipt:
         return self.__T_Receipt
     
     """
-        Metodo finalizzato ad ottenere una lista delle categorie della ricevuta in base ad un type specifico.
-        type = 1: in base a Quantity
-        type = 2: in base a Q_Amount
-        type = 3: base a Q_Discount_Amount
-        Return di una lista.
+        Metodo finalizzato ad ottenere un dizionario delle categorie della ricevuta con il corrispettivo QAmount.
+        Return di un dizionario.
     """
-    def getInfoCategories(self, type):
-        # creazione di un dizionario per mantenere la somma delle quantità/qamount/qdiscountamount per ogni categoria
+    def getInfoCategories(self, categories):
+        # creazione di un dizionario per mantenere la somma delle qamount per ogni categoria
         categories_count = {}
 
-        if type == 1:           # categorie in base alla quantity
-            for line in self.__lines:
-                category_id = line.getCategoryID()
-                quantity = line.getQuantity()
-                if category_id in categories_count:
-                    categories_count[category_id] += quantity
-                else:
-                    categories_count[category_id] = quantity
-        elif type == 2:         # categorie in base alla q_amount
-            for line in self.__lines:
-                category_id = line.getCategoryID()
-                q_amount = line.getQAmount()
-                if category_id in categories_count:
-                    categories_count[category_id] += q_amount
-                else:
-                    categories_count[category_id] = q_amount
-        elif type == 3:         # categorie in base alla q_discount_amount
-            for line in self.__lines:
-                category_id = line.getCategoryID()
-                q_discount_amount = line.getQDiscountAmount()
-                if category_id in categories_count:
-                    categories_count[category_id] += q_discount_amount
-                else:
-                    categories_count[category_id] = q_discount_amount
-        else:
-            return None
+        for line in self.__lines:
+            categories_list = line.getCategories()
+            q_amount = line.getQAmount()
+            for category in categories_list:
+                categories_count.setdefault(category, 0)
+                categories_count[category] += q_amount
 
-        info_categories = []
-
-        keys_categories = Receipt.categories.keys()
-        keys_categories_count = categories_count.keys()
-
-        for key in keys_categories:
-            if key in keys_categories_count:
-                info_categories += [categories_count[key]]
-            else:
-                info_categories += [0]
-        
-        while(len(info_categories) < Receipt.numCategories[0]):
-            info_categories += [0]
+        info_categories = {category: categories_count.get(category, 0) for category in categories}
 
         return info_categories
-
-    """
-        Metodo finalizzato ad ottenere il numero distinto di categorie presenti nella ricevuta.
-        Return di un tipo int.
-    """
-    def getNumDistinctCategories(self):
-        distinctCategories = set([receiptLine.getCategoryID() for receiptLine in self.__lines])
-        return len(distinctCategories)
