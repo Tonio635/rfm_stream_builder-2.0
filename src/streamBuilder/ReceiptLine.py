@@ -12,14 +12,14 @@ class ReceiptLine:
 
     """
         Metodo costruttore. Inizializza gli attributi privati della classe con i valori passati in input.
-            - categoryID: id della categoria del prodotto a cui fa riferimento la receiptline;
+            - categories: categorie del prodotto a cui fa riferimento la receiptline;
             - Quantity: quantità del prodotto acquistato, di tipo int;
             - Q_Amount: prezzo singolo, di tipo float;
             - Q_Discount_Amount: sconto singolo, di tipo int, al momento non trattato;
     """
 
-    def __init__(self, categoryID, Quantity, Q_Amount, Q_Discount_Amount):
-        self.__categoryID = categoryID
+    def __init__(self, categories, Quantity, Q_Amount, Q_Discount_Amount):
+        self.__categories = categories
         self.__Quantity = Quantity
         self.__Q_Amount = Q_Amount
         self.__Q_Discount_Amount = Q_Discount_Amount
@@ -49,9 +49,9 @@ class ReceiptLine:
         return self.__Q_Discount_Amount
 
     """
-        Metodo getter attributo categoryID.
-        Return di un tipo int.
+        Metodo getter attributo categories.
+        Return di una lista di string.
     """
 
-    def getCategoryID(self):
-        return self.__categoryID
+    def getCategories(self):
+        return self.__categories
