@@ -10,7 +10,7 @@
 """
 
 import mysql.connector
-from Receipt import Receipt
+from CategoryMapping import CategoryMapping
 
 class DBConnector:
     __mydb = mysql.connector.MySQLConnection()
@@ -44,24 +44,81 @@ class DBConnector:
     def closeConnection(self):
         self.__mydb.close()
 
+    def __scaleHierarchy(self, child, hierarchy, diff):
+        parents = []
+
+        if diff == 0:
+            return [child]
+
+        for row in hierarchy:
+            if child == row[1]:
+                parents.append(row[0])
+
+        result = []
+        for parent in parents:
+            result += self.__scaleHierarchy(parent, hierarchy, diff-1)
+
+        return result
+
+    def __descendHierarchy(self, parent, hierarchy, diff):
+        children = []
+
+        if diff == 0:
+            return [parent]
+
+        for row in hierarchy:
+            if parent == row[0]:
+                children.append(row[1])
+
+        result = []
+        for child in children:
+            result += self.__descendHierarchy(child, hierarchy, diff-1)
+
+        return result
+
+    def extractProductHierarchy(self, level):
+        mapping = {}
+        cursor = self.__mydb.cursor()
+        cursor.execute("SELECT Products.K_Product, Products.K_Product_Type, N_Level FROM Products, Product_Types WHERE Products.K_Product_Type=Product_Types.K_Product_Type")
+        products = cursor.fetchall()
+
+        cursor.execute("SELECT K_Product_Parent, K_Product_Child FROM Product_Hierarchies")
+        hierarchy = cursor.fetchall()
+
+        for row in products:
+            mapping[row[0]] = []
+            if row[2] == level:
+                mapping[row[0]].append(row[1])
+            elif row[2] > level:
+                parents = self.__scaleHierarchy(row[0], hierarchy, row[2] - level)                
+                mapping[row[0]] = list(set([products[[x[0] for x in products].index(val)][1] for val in parents]))
+            else:
+                children = self.__descendHierarchy(row[0], hierarchy, level - row[2])
+                mapping[row[0]] = list(set([products[[x[0] for x in products].index(val)][1] for val in children]))
+            
+
+        return CategoryMapping(mapping)
+
     """
         Metodo che effettua la query estraendo le ricevute del giorno.
         I metodi execute() eseguono la query SQL e restituiscono il risultato.
         cursor() di un oggetto MySQLConnection per creare un oggetto cursore per eseguire varie operazioni SQL.
     """
-    def extractReceipts(self, gg):
+    def extractReceipts(self, gg, mapping):
         cursor = self.__mydb.cursor()
         cursor.execute("SELECT * FROM Receipts WHERE DATE(T_Receipt) = %s ORDER BY K_Member, T_Receipt ASC",
                        [gg.isoformat()])
         rows = cursor.fetchall()
         
         for i in range(len(rows)):
-            cursor.execute("SELECT D_Product, Quantity, Q_Amount, Q_Discount_Amount FROM Receipt_Lines, Products WHERE %s = K_Receipt AND Receipt_Lines.K_Product = Products.K_Product", [rows[i][0]])
+            cursor.execute("SELECT Products.K_Product, Quantity, Q_Amount, Q_Discount_Amount FROM Receipt_Lines, Products WHERE %s = K_Receipt AND Receipt_Lines.K_Product = Products.K_Product", [rows[i][0]])
             lines = cursor.fetchall()
+            for j in range(len(lines)):
+                lines[j] = list(lines[j])
+                lines[j][0] = mapping.getProductCategories(lines[j][0])
+                lines[j] = tuple(lines[j])
             rows[i] = rows[i] + (lines,)
         
-        cursor.execute("SELECT COUNT(DISTINCT Products.D_Product) FROM Receipt_Lines, Products WHERE Receipt_Lines.K_Product = Products.K_Product")
-        Receipt.numCategories = cursor.fetchone()
         return rows
 
     """
