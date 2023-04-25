@@ -31,13 +31,11 @@ class DataWindow:
             - currentDay: giorno attuale;
             - examples: dizionario che conterrà gli esempi in attesa di essere etichettati;
             - window: dizionario <k, v> dove k = K_Member e v = customerWindow di quel cliente;
-            - type: valore su cui si deve basare la lista categorie.
     """
-    def __init__(self, periodDim: int, periods: int, churnDim: int, type: int):
+    def __init__(self, periodDim: int, periods: int, churnDim: int):
         self.__churnDim = churnDim
         self.__periodDim: int = periodDim
         self.__periods: int = periods
-        self.__type: int = type
         self.__windowDim: int = max(periodDim * periods, churnDim)
         self.__currentDay: dt.date = None
         self.__examples: ExampleDictionary = ExampleDictionary()
@@ -58,19 +56,8 @@ class DataWindow:
             # Scandisce la lista di tuple
             for row in data:
                 receiptLines = []
-                keys = list(Receipt.categories.keys())
-                if len(keys) < 1:
-                    i = 0
-                else:
-                    i = keys[-1] + 1
                 for line in row[6]:
-                    if line[0] not in Receipt.categories.values():
-                        Receipt.categories[i] = line[0]
-                        receiptLines.append(ReceiptLine(i, line[1], line[2], line[3]))
-                        i += 1
-                    else:
-                        reverse_dict = {v: k for k, v in Receipt.categories.items()}
-                        receiptLines.append(ReceiptLine(reverse_dict[line[0]], line[1], line[2], line[3]))
+                    receiptLines.append(ReceiptLine(line[0], line[1], line[2], line[3]))
                 # Confronta l'attuale 'K_Member' con oldMember. Se non siamo ancora sulle sue ricevute
                 if row[1] != oldMember:
                     # Costruisce il Day passando come oggetto la lista di receipts
@@ -129,7 +116,7 @@ class DataWindow:
             - generazione di un esempio per ogni ricevuta del currentDay.
         Per ogni esempio calcolo RFM su tutti i 'periods' periodi. 
     """
-    def generateExamplesLabelsForMulReceipts(self, toFill: list):
+    def generateExamplesLabelsForMulReceipts(self, toFill: list, categories: list[str], oldProductRfm: list[list[Rfm]]):
         # Generazione esempi per tutti quei clienti che hanno comprato
         # nel periodo che va da ]currentDay-churnDim, currentDay]
         try:
@@ -140,25 +127,21 @@ class DataWindow:
                 rfm = Rfm(0, 0, 0)
                 periods = self.__splitPeriods(cw)
                 ex = Example(self.__currentDay)
+                if self.__examples.containsKey(cw.getKMember()):
+                    oldProductRfm = self.__examples.getDict()[cw.getKMember()].getExample(-1).getProductRfm()
                 for period in periods:
                     rfm = self.__calculateRFM(period)
+                    productRfm = self.__calculateProductRFM(period, categories)
                     ex.addRfm(rfm)
-                purchasedToday = cw.getLastReceipt().date() == self.__currentDay
-                if not purchasedToday:
-                    categories = [0] * Receipt.numCategories[0]
-                    ex.setInfoCategories(categories)
-                # Accesso all'ultimo elemento della DataWindow attraverso l'operatore 'itemgetter' della libreria
-                # operator per controllare qualora vi siano più ricevute relative al currentDay
-                day = operator.itemgetter(-1)(cw.getListOfDays())
-                if day is not None:
-                    receipts = day.getReceiptsOfDay()
-                    receipts.reverse()
-                    ex.setInfoCategories(receipts[0].getInfoCategories(self.__type))
-                    ex.setNumDistinctCategories(receipts[0].getNumDistinctCategories())
+                    ex.addProductRfm(productRfm)
                 # Inserisce l'esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
                 self.__examples.insertExample(cw.getKMember(), ex)
                 # Verifica se il cliente attuale ha acquistato nel currentDay
-                if purchasedToday:
+                if cw.getLastReceipt().date() == self.__currentDay:
+                    # Accesso all'ultimo elemento della DataWindow attraverso l'operatore 'itemgetter' della libreria
+                    # operator per controllare qualora vi siano più ricevute relative al currentDay
+                    day = operator.itemgetter(-1)(cw.getListOfDays())
+                    receipts = day.getReceiptsOfDay()
                     # Se nel Day ci sono più ricevute
                     if len(receipts) > 1:
                         # Instanziazione dell'ExampleSequence che conterrà gli esempi da etichettare immediatamente
@@ -166,20 +149,34 @@ class DataWindow:
                         # Ciclo sulle ricevute del giorno partendo dall'ultima. Questo ci permetterà di scandire una sola
                         # volta il periodo per il calcolo RFM. Per le ricevute precedenti all'ultima, il calcolo viene
                         # effettuato per sottrazione.
+                        receipts.reverse()
                         oldMonetary = receipts[0].getQAmount()
+                        calcPrevRFM = receipts[1:].copy()
                         for receipt in receipts[1:]:
                             rfm = Rfm(rfm.getRecency(), rfm.getFrequency() - 1, rfm.getMonetary() - oldMonetary)
+                            productsRfm = []
+                            for i in range(len(categories)):
+                                recency = -1
+                                for ricevuta in calcPrevRFM:
+                                    if ricevuta.getInfoCategories(categories)[categories[i]] != 0:
+                                        recency = 0
+                                        break
+                                if oldProductRfm[i][1].getRecency() != -1 and recency == -1:
+                                    recency = oldProductRfm[i][1].getRecency() + 1
+                                frequency = np.count_nonzero([ricevuta.getInfoCategories(categories)[categories[i]] for ricevuta in calcPrevRFM if ricevuta is not None]) + oldProductRfm[i][1].getFrequency()
+                                monetary = np.sum([ricevuta.getInfoCategories(categories)[categories[i]] for ricevuta in calcPrevRFM if ricevuta is not None]) + + oldProductRfm[i][1].getMonetary()
+                                productsRfm.append(Rfm(recency, frequency, monetary))
+                            calcPrevRFM.pop(0)
                             newExample = ex.copy()
-                            newExample.setInfoCategories(receipt.getInfoCategories(self.__type))
-                            newExample.setNumDistinctCategories(receipt.getNumDistinctCategories())
                             newExample.replaceLastRfm(rfm)
+                            newExample.replaceLastProductRfm(productsRfm)
                             newExample.setLabelTimestamp(receipt.getTReceipt())
                             seq.appendExample(newExample.copy())
                             oldMonetary = receipt.getQAmount()
                         # Etichettatura a False degli esempi costruiti per questa casistica
                         seq.record(False, toFill)
-        except TypeError:
-            pass
+        except TypeError as err:
+            print(err)
 
     """
         Metodo per suddividere una CustomerWindow in 'periods' sotto-periodi di dimensione 'periodDim'.
@@ -210,16 +207,58 @@ class DataWindow:
         return Rfm(recency, frequency, monetary)
 
     """
+        Metodo per calcolare l'RFM delle categorie dei prodotti, dato in input il periodo.
+        Ritorna al chiamante un oggetto di tipo lista di Rfm.
+    """
+    def __calculateProductRFM(self, period: list[Day], categories: list[str]):
+        recency = -1
+        frequency = 0
+        monetary = 0
+        productsRFM = []
+        for key in categories:
+            if period != [None] * self.__periodDim:
+                days = []
+                receipts = []
+                for day in period:
+                    if day is not None:
+                        days.append(day.getReceiptsOfDay())
+                        for receipt in day.getReceiptsOfDay():
+                            receipts.append(receipt)
+                    else:
+                        days.append(None)
+                
+                found = False
+                lastPos = self.__periodDim
+                for pos, value in enumerate(days.__reversed__()):
+                    if value is not None:
+                        for receipt in value:
+                            if receipt.getInfoCategories(categories)[key] != 0:
+                                lastPos = self.__periodDim - pos - 1
+                                found = True
+                                break
+                        if found:
+                            break
+                
+                recency = self.__periodDim - lastPos - 1
+                frequency = np.count_nonzero([receipt.getInfoCategories(categories)[key] for receipt in receipts if receipt is not None])
+                monetary = np.sum([receipt.getInfoCategories(categories)[key] for receipt in receipts if receipt is not None])
+            productsRFM.append(Rfm(recency, frequency, monetary))
+        
+        return productsRFM
+
+    """
         Metodo per generare le etichette.
     """
     def generateLabels(self, toFill: list):
         timestamp = dt.datetime(self.__currentDay.year, self.__currentDay.month, self.__currentDay.day, 23, 59, 59)
+        oldProductRfm = None
         try:
             customers = [cw.getKMember() for cw in self.__window.values() if
                          cw.getLastReceipt().date() == self.__currentDay]
             for customer in customers:
                 try:
                     self.__examples.recordLabeledExample(customer, False, timestamp, toFill)
+                    oldProductRfm = self.__examples.getDict()[customer].getExample(-1).getProductRfm()
                     self.__examples.delete(customer)
                 except KeyError:
                     pass
@@ -232,8 +271,11 @@ class DataWindow:
             for member in customers:
                 try:
                     self.__examples.recordLabeledExample(member, True, timestamp, toFill)
+                    oldProductRfm = self.__examples.getDict()[member].getExample(-1).getProductRfm()
                     self.__examples.delete(member)
                 except KeyError:
                     pass
         except TypeError:
             pass
+
+        return oldProductRfm
