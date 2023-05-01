@@ -28,7 +28,6 @@ class ReceiptLine:
         Metodo getter attributo Quantity.
         Return di un tipo int.
     """
-
     def getQuantity(self):
         return self.__Quantity
 
@@ -36,7 +35,6 @@ class ReceiptLine:
         Metodo getter attributo Q_Amount.
         Return di un tipo float.
     """
-
     def getQAmount(self):
         return self.__Q_Amount
 
@@ -44,7 +42,6 @@ class ReceiptLine:
         Metodo getter attributo Q_Discount_Amount.
         Return di un tipo int.
     """
-
     def getQDiscountAmount(self):
         return self.__Q_Discount_Amount
 
@@ -52,6 +49,5 @@ class ReceiptLine:
         Metodo getter attributo categories.
         Return di una lista di string.
     """
-
     def getCategories(self):
         return self.__categories

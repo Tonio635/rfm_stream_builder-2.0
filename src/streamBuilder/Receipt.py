@@ -70,6 +70,13 @@ class Receipt:
         return self.__T_Receipt
     
     """
+        Metodo getter attributo lines.
+        Return di un tipo lista di ReceiptLine.
+    """
+    def getLines(self):
+        return self.__lines
+    
+    """
         Metodo finalizzato ad ottenere un dizionario delle categorie della ricevuta con il corrispettivo QAmount.
         Return di un dizionario.
     """
