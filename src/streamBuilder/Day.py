@@ -32,3 +32,10 @@ class Day:
     """
     def getReceiptsOfDay(self):
         return self.__receipts
+    
+    """
+        Metodo che restituisce le categorie comprate nel Day.
+        Return di un tipo set di stringhe.
+    """
+    def getCategoriesBought(self):
+        return {category for receipt in self.__receipts for line in receipt.getLines() for category in line.getCategories()}
