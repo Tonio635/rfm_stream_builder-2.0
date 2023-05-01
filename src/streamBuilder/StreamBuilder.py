@@ -69,8 +69,8 @@ class StreamBuilder:
                 dataOfDay = self.__mydb.extractReceipts(currentDay, mapping)
                 self.__window.deleteFurthestDay()
                 self.__window.set(dataOfDay, currentDay)
-                oldProductRfm = self.__window.generateLabels(examplesOfDay)
-                self.__window.generateExamplesLabelsForMulReceipts(examplesOfDay, categories, oldProductRfm)  # and labels on multiple receipts
+                self.__window.generateLabels(examplesOfDay)
+                self.__window.generateExamplesLabelsForMulReceipts(examplesOfDay, categories)  # and labels on multiple receipts
                 self.__window.clean()
                 self.__insertLabeledExamples(examplesOfDay, currentDay)
                 currentDay += dt.timedelta(days=1)
