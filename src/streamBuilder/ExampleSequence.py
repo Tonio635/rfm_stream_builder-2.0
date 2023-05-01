@@ -25,9 +25,6 @@ class ExampleSequence:
     def appendExample(self, ex: Example):
         self.__examples.append(ex)
 
-    def getExample(self, pos: int):
-        return self.__examples[pos]
-
     """
         Metodo setter per il labelTimeStamp degli examples in ExampleSequence
     """
@@ -65,7 +62,7 @@ class ExampleSequence:
             
             for i in range(len(prodRfm)):
                 for j in range(len(prodRfm[i])):
-                    row += [prodRfm[i][j].getRecency(), prodRfm[i][j].getRecency(), prodRfm[i][j].getMonetary()]
+                    row += [prodRfm[i][j].getRecency(), prodRfm[i][j].getFrequency(), prodRfm[i][j].getMonetary()]
                 row += [maximum[i].getRecency(), maximum[i].getFrequency(), maximum[i].getMonetary()]
                 row += [minimum[i].getRecency(), minimum[i].getFrequency(), minimum[i].getMonetary()]
                 row += [mean[i].getRecency(), mean[i].getFrequency(), mean[i].getMonetary()]
