@@ -44,58 +44,42 @@ class DBConnector:
     def closeConnection(self):
         self.__mydb.close()
 
-    def __scaleHierarchy(self, child, hierarchy, diff):
-        parents = []
-
-        if diff == 0:
-            return [child]
-
-        for row in hierarchy:
-            if child == row[1]:
-                parents.append(row[0])
-
-        result = []
-        for parent in parents:
-            result += self.__scaleHierarchy(parent, hierarchy, diff-1)
-
-        return result
-
-    def __descendHierarchy(self, parent, hierarchy, diff):
-        children = []
-
-        if diff == 0:
-            return [parent]
-
-        for row in hierarchy:
-            if parent == row[0]:
-                children.append(row[1])
-
-        result = []
-        for child in children:
-            result += self.__descendHierarchy(child, hierarchy, diff-1)
-
-        return result
-
     def extractProductHierarchy(self, level):
         mapping = {}
+        hierarchy = {}
         cursor = self.__mydb.cursor()
-        cursor.execute("SELECT Products.K_Product, Products.K_Product_Type, N_Level FROM Products, Product_Types WHERE Products.K_Product_Type=Product_Types.K_Product_Type")
-        products = cursor.fetchall()
 
-        cursor.execute("SELECT K_Product_Parent, K_Product_Child FROM Product_Hierarchies")
-        hierarchy = cursor.fetchall()
+        cursor.execute("SELECT K_Product_Parent, K_Product_Child, N_Level FROM Product_Hierarchies, Products, Product_Types WHERE Products.K_Product_Type=Product_Types.K_Product_Type AND K_Product_Parent=Products.K_Product ORDER BY N_Level")
+        hierarchyTable = cursor.fetchall()
 
-        for row in products:
-            mapping[row[0]] = []
-            if row[2] == level:
-                mapping[row[0]].append(row[1])
-            elif row[2] > level:
-                parents = self.__scaleHierarchy(row[0], hierarchy, row[2] - level)                
-                mapping[row[0]] = list(set([products[[x[0] for x in products].index(val)][1] for val in parents]))
+        for row in hierarchyTable:
+            if row[0] not in hierarchy.keys():
+                hierarchy[row[0]] = [set(), row[2]]
+                hierarchy[row[0]][0].add(row[1])
             else:
-                children = self.__descendHierarchy(row[0], hierarchy, level - row[2])
-                mapping[row[0]] = list(set([products[[x[0] for x in products].index(val)][1] for val in children]))
-            
+                hierarchy[row[0]][0].add(row[1])
+
+            if row[1] not in hierarchy.keys():
+                hierarchy[row[1]] = [set(), row[2] + 1]
+                mapping[row[1]] = set()
+
+            mapping[row[0]] = set()
+
+        for key, values in hierarchy.items():
+            if values[1] == level:
+                mapping[key].add(key)
+                for value in values[0]:
+                    mapping[value].add(key)
+            elif values[1] > level:
+                for value in values[0]:
+                    mapping[value] |= mapping[key]
+
+        my_dict = {k: v for k, v in hierarchy.items() if v[1] < level}
+        new_dict = dict(sorted(my_dict.items(), key=lambda x: x[1], reverse=True))
+
+        for key, values in new_dict.items():
+            for value in values[0]:
+                mapping[key] |= mapping[value]
 
         return CategoryMapping(mapping)
 
