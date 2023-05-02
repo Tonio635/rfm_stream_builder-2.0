@@ -55,34 +55,31 @@ class DBConnector:
 
         for row in hierarchyTable:
             if row[0] not in hierarchy.keys():
-                hierarchy[row[0]] = [[row[1]], row[2]]
+                hierarchy[row[0]] = [OrderedSet([row[1]]), row[2]]
             else:
-                if row[1] not in hierarchy[row[0]][0]:
-                    hierarchy[row[0]][0].append(row[1])
+                hierarchy[row[0]][0].add(row[1])
 
             if row[1] not in hierarchy.keys():
-                hierarchy[row[1]] = [[], row[2] + 1]
-                mapping[row[1]] = []
+                hierarchy[row[1]] = [OrderedSet(), row[2] + 1]
+                mapping[row[1]] = OrderedSet()
 
-            mapping[row[0]] = []
+            mapping[row[0]] = OrderedSet()
 
         for key, values in hierarchy.items():
             if values[1] == level:
-                if key not in mapping[key]:
-                    mapping[key].append(key)
+                mapping[key].add(key)
                 for value in values[0]:
-                    if key not in mapping[value]:
-                        mapping[value].append(key)
+                    mapping[value].add(key)
             elif values[1] > level:
                 for value in values[0]:
-                    mapping[value] = list(OrderedSet(mapping[value] + mapping[key]))
+                    mapping[value] |= mapping[key]
 
         my_dict = {k: v for k, v in hierarchy.items() if v[1] < level}
         new_dict = dict(sorted(my_dict.items(), key=lambda x: x[1], reverse=True))
 
         for key, values in new_dict.items():
             for value in values[0]:
-                mapping[key] = list(OrderedSet(mapping[key] + mapping[value]))
+                mapping[key] |= mapping[value]
 
         return CategoryMapping(mapping)
 

@@ -1,3 +1,5 @@
+from ordered_set import OrderedSet
+
 class CategoryMapping:
 
     def __init__(self, products):
@@ -7,11 +9,10 @@ class CategoryMapping:
         return self.__products[KProduct]
 
     def getDistinctCategories(self):
-        categories = []
+        categories = OrderedSet()
         
         for category_list in self.__products.values():
             for category in category_list:
-                if category not in categories:
-                    categories.append(category)
+                categories.add(category)
 
-        return categories
+        return list(categories)
