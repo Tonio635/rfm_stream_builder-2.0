@@ -130,7 +130,7 @@ class DataWindow:
                 periods = self.__splitPeriods(cw)
                 ex = Example(self.__currentDay)
 
-                recencyPeriod = [periods[0][-1]] + periods[1][:-1]
+                recencyPeriod = [periods[-2][-1]] + periods[-1][:-1] if len(periods > 1) else [None] + periods[-1][:-1]
 
                 for day in recencyPeriod:
                     categoriesBought = day.getCategoriesBought() if day is not None else set()
