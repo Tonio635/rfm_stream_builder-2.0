@@ -11,7 +11,7 @@ import scikitplot as skplt
 import argparse
 import datetime
 
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 from src.classification.offline.OfflineLearner import OfflineLearner
 from src.classification.PickleLoader import PickleLoader
 from src.classification.offline.OfflineClassifierEnum import OfflineClassifierEnum
@@ -34,8 +34,10 @@ class Main:
     def __printReport(self, results: list, title: str):
         acc = accuracy_score(results[0], results[1])
         report = classification_report(results[0], results[1])
+        auc_roc = roc_auc_score(results[0], results[1])
         print(f'Accuracy: {acc}')
         print(f'Missclassification: {1 - acc}')
+        print(f'AUC-ROC: {auc_roc}')
         print(report)
         skplt.metrics.plot_confusion_matrix(results[0], results[1])
         plt.title(title)
