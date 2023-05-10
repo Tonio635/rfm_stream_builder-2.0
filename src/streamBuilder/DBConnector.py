@@ -74,10 +74,10 @@ class DBConnector:
                 for value in values[0]:
                     mapping[value] |= mapping[key]
 
-        my_dict = {k: v for k, v in hierarchy.items() if v[1] < level}
-        new_dict = dict(sorted(my_dict.items(), key=lambda x: x[1], reverse=True))
+        upper_level = {k: v for k, v in hierarchy.items() if v[1] < level}
+        upper_level = dict(reversed(list(upper_level.items())))
 
-        for key, values in new_dict.items():
+        for key, values in upper_level.items():
             for value in values[0]:
                 mapping[key] |= mapping[value]
 
