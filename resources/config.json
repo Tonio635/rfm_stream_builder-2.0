@@ -1,0 +1,42 @@
+{
+    "host":{
+        "value": "localhost",
+        "description": "Il nome del server o l'indirizzo IP su cui è in esecuzione MySQL. Se si esegue su localhost è possibile utilizzare localhost o IP 127.0.0.0."
+    },
+    "user": {
+        "value": "root",
+        "description": "Il nome utente che si utilizza per lavorare con MySQL. Il nome utente predefinito per il database MySQL è root."
+    },
+    "password": {
+        "value": "",
+        "description": "La password viene fornita dall'utente al momento dell'installazione del server MySQL."
+    },
+    "database": {
+        "value": "brazilian_churn_retail_db_verfour",
+        "description": "Il nome del database a cui si desidera connettersi ed eseguire le operazioni"
+    },
+    "churnDim": {
+        "value": 120,
+        "description": "Dimensione del churn, di tipo int."
+    },
+    "periodDim": {
+        "value": 120,
+        "description": "Dimensione del periodo, di tipo int."
+    },
+    "periods": {
+        "value": 3,
+        "description": "Numero di periodi, di tipo int."
+    },
+    "level": {
+        "value": 2,
+        "description": "Livello di gerarchia delle categorie da utilizzare."
+    },
+    "start": {
+        "value": null,
+        "description": "Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db."
+    },
+    "end": {
+        "value": null,
+        "description": "Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l'ultima del db."
+    }
+}

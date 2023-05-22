@@ -8,6 +8,7 @@
                  Il metodo privato generateStream genererà esempi opportunamente etichettati.
                  Infine la connessione al db e il file verranno chiuse.
 """
+import json
 import os
 import mysql.connector.errors
 import pandas as pd
@@ -18,6 +19,7 @@ from DBConnector import DBConnector
 from DataWindow import DataWindow
 from pathlib import Path
 import argparse
+import sys
 
 
 class StreamBuilder:
@@ -35,13 +37,20 @@ class StreamBuilder:
             - start: data di partenza, di default la prima del db;
             - end: data di fine, di default l'ultima del db;
             - outputFolder: percorso della cartella output dove vengono salvati i pickle;
-            - type: valore su cui si deve basare la top categorie.
         Inizializza la DataWindow e richiama il metodo privato generateStream().
     """
+
     def __init__(self, host: str, username: str, password: str, databaseName: str,
                  churnDim: int, periodDim: int, periods: int, level: int, start: dt.date = None,
                  end: dt.date = None):
-        self.__outputFolder = Path("./../../output")
+        current_dir = os.getcwd()
+        dir_target = 'rfm_stream_builder'
+
+        while os.path.basename(current_dir) != dir_target:
+            current_dir = os.path.dirname(current_dir)
+        
+        self.__outputFolder = Path(current_dir + "/output")
+
         if None in [host, username, password, databaseName, churnDim, periodDim, periods]:
             raise ValueError("Argomenti non validi, assicurati di aver inserito tutti i parametri necessari!")
         if churnDim > periodDim*periods:
@@ -58,6 +67,7 @@ class StreamBuilder:
     """
         Metodo per la generazione ed etichettatura di esempi. Infine serializziamo gli esempi in un pickle.
     """
+
     def __generateStream(self, start: str, end: str, level: int):
         currentDay = self.__mydb.extractFirstDay() if start is None else dt.date.fromisoformat(start)
         lastDay = self.__mydb.extractLastDay() if end is None else dt.date.fromisoformat(end)
@@ -82,6 +92,7 @@ class StreamBuilder:
        Ciascun file (pickle) avrà nome pari al currentDay in cui è stato etichettato.
        I Day vuoti non verranno serializzati.
     """
+
     def __insertLabeledExamples(self, examplesOfDay: list, currentDay: dt.date):
         try:
             df = pd.DataFrame(examplesOfDay)
@@ -106,7 +117,6 @@ class StreamBuilder:
             pass
 
 
-
 """
     Sfruttiamo la libreria argparse per creare degli argument utilizzabili da Command Line
 """
@@ -118,8 +128,7 @@ parser.add_argument('--user', help='Il nome utente che si utilizza per lavorare 
                     'per il database MySQL è root.', default='root', type=str)
 parser.add_argument('--password', help='La password viene fornita dall\'utente al momento dell\'installazione del '
                     'server MySQL.', type=str)
-parser.add_argument('--database', help='Il nome del database a cui si desidera connettersi ed eseguire le operazioni.'
-                    , type=str)
+parser.add_argument('--database', help='Il nome del database a cui si desidera connettersi ed eseguire le operazioni.', type=str)
 parser.add_argument('--churnDim', help='Dimensione del churn, di tipo int.', type=int)
 parser.add_argument('--periodDim', help='Dimensione del periodo, di tipo int.', type=int)
 parser.add_argument('--periods', help='Numero di periodi, di tipo int.', type=int)
@@ -130,7 +139,21 @@ parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONAL
                     default=None)
 args = parser.parse_args()
 try:
-    StreamBuilder(args.host, args.user, args.password, args.database, args.churnDim, args.periodDim, args.periods,
-                  args.level, args.start, args.end)
+    if len(sys.argv) > 1:
+        StreamBuilder(args.host, args.user, args.password, args.database, args.churnDim, args.periodDim, args.periods,
+                      args.level, args.start, args.end)
+    else:
+        current_dir = os.getcwd()
+        dir_target = 'rfm_stream_builder'
+
+        while os.path.basename(current_dir) != dir_target:
+            current_dir = os.path.dirname(current_dir)
+
+        with open(current_dir + '/resources/config.json', 'r') as file:
+            config = json.load(file)
+
+        StreamBuilder(config["host"]["value"], config["user"]["value"], config["password"]["value"], config["database"]["value"],
+                      config["churnDim"]["value"], config["periodDim"]["value"], config["periods"]["value"], config["level"]["value"],
+                      config["start"]["value"], config["end"]["value"])
 except ValueError as err:
     print('\033[91m' + str(err))
