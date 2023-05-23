@@ -28,6 +28,7 @@ class OfflineRandomForest(OfflineClassifierInterface):
         richiama il fit di RandomForest
     """
     def learn(self, x: np.ndarray, y: np.ndarray):
+        self.__model.set_params(class_weight={0: len(y)/(2 * sum(y == 0)), 1: len(y)/(2 * sum(y == 1))})
         self.__model = self.__model.fit(x, y)
         return self
 

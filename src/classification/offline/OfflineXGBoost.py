@@ -17,6 +17,7 @@ class OfflineXGBoost(OfflineClassifierInterface):
         richiama il fit di XGBoost
     """
     def learn(self, x: np.ndarray, y: np.ndarray):
+        self.__model.set_params(scale_pos_weight=sum(y == 0) / sum(y == 1))
         self.__model = self.__model.fit(x, y)
         return self
 
