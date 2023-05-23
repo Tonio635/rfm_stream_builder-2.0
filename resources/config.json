@@ -31,6 +31,22 @@
         "value": 2,
         "description": "Livello di gerarchia delle categorie da utilizzare."
     },
+    "traditionalRFM": {
+        "value": 1,
+        "description": "Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No)."
+    },
+    "aggregates": {
+        "value": 0,
+        "description": "Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No)."
+    },
+    "productRFM": {
+        "value": 0,
+        "description": "Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No)."
+    },
+    "productAggregates": {
+        "value": 0,
+        "description": "Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No)."
+    },
     "start": {
         "value": null,
         "description": "Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db."

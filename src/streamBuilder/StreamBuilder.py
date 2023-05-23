@@ -41,7 +41,8 @@ class StreamBuilder:
     """
 
     def __init__(self, host: str, username: str, password: str, databaseName: str,
-                 churnDim: int, periodDim: int, periods: int, level: int, start: dt.date = None,
+                 churnDim: int, periodDim: int, periods: int, level: int, traditionalRFM: int, aggregates: int,
+                 productRFM: int, productAggregates: int, start: dt.date = None,
                  end: dt.date = None):
         current_dir = os.getcwd()
         dir_target = 'rfm_stream_builder'
@@ -51,7 +52,7 @@ class StreamBuilder:
         
         self.__outputFolder = Path(current_dir + "/output")
 
-        if None in [host, username, password, databaseName, churnDim, periodDim, periods]:
+        if None in [host, username, password, databaseName, churnDim, periodDim, periods, level, traditionalRFM, aggregates, productRFM, productAggregates]:
             raise ValueError("Argomenti non validi, assicurati di aver inserito tutti i parametri necessari!")
         if churnDim > periodDim*periods:
             raise ValueError("Il parametro churnDim non può essere maggiore di periodDim*periods. "
@@ -61,7 +62,10 @@ class StreamBuilder:
         except mysql.connector.errors.ProgrammingError:
             raise ValueError("Connessione al db fallita, controllare che i parametri siano corretti")
 
-        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim)
+        if set([traditionalRFM, aggregates, productRFM, productAggregates]) != {0, 1}:
+            raise ValueError("I valori delle features devono essere 0 o 1!")
+
+        self.__window: DataWindow = DataWindow(periodDim, periods, churnDim, traditionalRFM, aggregates, productRFM, productAggregates)
         self.__generateStream(start, end, level)
 
     """
@@ -133,6 +137,10 @@ parser.add_argument('--churnDim', help='Dimensione del churn, di tipo int.', typ
 parser.add_argument('--periodDim', help='Dimensione del periodo, di tipo int.', type=int)
 parser.add_argument('--periods', help='Numero di periodi, di tipo int.', type=int)
 parser.add_argument('--level', help='Livello di gerarchia delle categorie da utilizzare.', type=int)
+parser.add_argument('--traditionalRFM', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
+parser.add_argument('--aggregates', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
+parser.add_argument('--productRFM', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
+parser.add_argument('--productAggregates', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No)..', type=int)
 parser.add_argument('--start', help='Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db.',
                     default=None)
 parser.add_argument('--end', help='Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l\'ultima del db.',
@@ -141,7 +149,7 @@ args = parser.parse_args()
 try:
     if len(sys.argv) > 1:
         StreamBuilder(args.host, args.user, args.password, args.database, args.churnDim, args.periodDim, args.periods,
-                      args.level, args.start, args.end)
+                      args.level, args.traditionalRFM, args.aggregates, args.productRFM, args.productAggregates, args.start, args.end)
     else:
         current_dir = os.getcwd()
         dir_target = 'rfm_stream_builder'
@@ -154,6 +162,7 @@ try:
 
         StreamBuilder(config["host"]["value"], config["user"]["value"], config["password"]["value"], config["database"]["value"],
                       config["churnDim"]["value"], config["periodDim"]["value"], config["periods"]["value"], config["level"]["value"],
-                      config["start"]["value"], config["end"]["value"])
+                      config["traditionalRFM"]["value"], config["aggregates"]["value"], config["productRFM"]["value"],
+                      config["productAggregates"]["value"], config["start"]["value"], config["end"]["value"])
 except ValueError as err:
     print('\033[91m' + str(err))

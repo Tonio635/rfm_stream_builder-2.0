@@ -33,10 +33,16 @@ class DataWindow:
             - examples: dizionario che conterrà gli esempi in attesa di essere etichettati;
             - window: dizionario <k, v> dove k = K_Member e v = customerWindow di quel cliente;
     """
-    def __init__(self, periodDim: int, periods: int, churnDim: int):
+
+    def __init__(self, periodDim: int, periods: int, churnDim: int, traditionalRFM: int, aggregates: int,
+                 productRFM: int, productAggregates: int):
         self.__churnDim = churnDim
         self.__periodDim: int = periodDim
         self.__periods: int = periods
+        self.__traditionalRFM: int = traditionalRFM
+        self.__aggregates: int = aggregates
+        self.__productRFM: int = productRFM
+        self.__productAggregates: int = productAggregates
         self.__windowDim: int = max(periodDim * periods, churnDim)
         self.__currentDay: dt.date = None
         self.__examples: ExampleDictionary = ExampleDictionary()
@@ -141,6 +147,7 @@ class DataWindow:
                             recencys[key] += 1
 
                 for period in periods:
+                    
                     rfm = self.__calculateRFM(period)
                     productRfm = self.__calculateProductRFM(period, categories)
                     ex.addRfm(rfm)
@@ -195,7 +202,7 @@ class DataWindow:
                             oldReceiptCategories = set(category for line in receipt.getLines() for category in line.getCategories())
 
                         # Etichettatura a False degli esempi costruiti per questa casistica
-                        seq.record(False, toFill)
+                        seq.record(False, toFill, self.__traditionalRFM, self.__aggregates, self.__productRFM, self.__productAggregates)
         except TypeError as err:
             print(err)
 
@@ -277,7 +284,7 @@ class DataWindow:
                          cw.getLastReceipt().date() == self.__currentDay]
             for customer in customers:
                 try:
-                    self.__examples.recordLabeledExample(customer, False, timestamp, toFill)
+                    self.__examples.recordLabeledExample(customer, False, timestamp, toFill, self.__traditionalRFM, self.__aggregates, self.__productRFM, self.__productAggregates)
                     self.__examples.delete(customer)
                 except KeyError:
                     pass
@@ -289,7 +296,7 @@ class DataWindow:
                          (self.__currentDay - cw.getLastReceipt().date()).days == self.__churnDim]
             for member in customers:
                 try:
-                    self.__examples.recordLabeledExample(member, True, timestamp, toFill)
+                    self.__examples.recordLabeledExample(member, True, timestamp, toFill, self.__traditionalRFM, self.__aggregates, self.__productRFM, self.__productAggregates)
                     self.__examples.delete(member)
                 except KeyError:
                     pass
