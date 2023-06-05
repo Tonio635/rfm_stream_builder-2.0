@@ -10,7 +10,8 @@
 """
 
 import mysql.connector
-
+from CategoryMapping import CategoryMapping
+from ordered_set import OrderedSet
 
 class DBConnector:
     __mydb = mysql.connector.MySQLConnection()
@@ -44,16 +45,64 @@ class DBConnector:
     def closeConnection(self):
         self.__mydb.close()
 
+    def extractProductHierarchy(self, level):
+        mapping = {}
+        hierarchy = {}
+        cursor = self.__mydb.cursor()
+
+        cursor.execute("SELECT K_Product_Parent, K_Product_Child, N_Level FROM Product_Hierarchies, Products, Product_Types WHERE Products.K_Product_Type=Product_Types.K_Product_Type AND K_Product_Parent=Products.K_Product ORDER BY N_Level")
+        hierarchyTable = cursor.fetchall()
+
+        for row in hierarchyTable:
+            if row[0] not in hierarchy.keys():
+                hierarchy[row[0]] = [OrderedSet([row[1]]), row[2]]
+            else:
+                hierarchy[row[0]][0].add(row[1])
+
+            if row[1] not in hierarchy.keys():
+                hierarchy[row[1]] = [OrderedSet(), row[2] + 1]
+                mapping[row[1]] = OrderedSet()
+
+            mapping[row[0]] = OrderedSet()
+
+        for key, values in hierarchy.items():
+            if values[1] == level:
+                mapping[key].add(key)
+                for value in values[0]:
+                    mapping[value].add(key)
+            elif values[1] > level:
+                for value in values[0]:
+                    mapping[value] |= mapping[key]
+
+        upper_level = {k: v for k, v in hierarchy.items() if v[1] < level}
+        upper_level = dict(reversed(list(upper_level.items())))
+
+        for key, values in upper_level.items():
+            for value in values[0]:
+                mapping[key] |= mapping[value]
+
+        return CategoryMapping(mapping)
+
     """
         Metodo che effettua la query estraendo le ricevute del giorno.
         I metodi execute() eseguono la query SQL e restituiscono il risultato.
         cursor() di un oggetto MySQLConnection per creare un oggetto cursore per eseguire varie operazioni SQL.
     """
-    def extractReceipts(self, gg):
+    def extractReceipts(self, gg, mapping):
         cursor = self.__mydb.cursor()
         cursor.execute("SELECT * FROM Receipts WHERE DATE(T_Receipt) = %s ORDER BY K_Member, T_Receipt ASC",
                        [gg.isoformat()])
         rows = cursor.fetchall()
+        
+        for i in range(len(rows)):
+            cursor.execute("SELECT Products.K_Product, Quantity, Q_Amount, Q_Discount_Amount FROM Receipt_Lines, Products WHERE %s = K_Receipt AND Receipt_Lines.K_Product = Products.K_Product", [rows[i][0]])
+            lines = cursor.fetchall()
+            for j in range(len(lines)):
+                lines[j] = list(lines[j])
+                lines[j][0] = mapping.getProductCategories(lines[j][0])
+                lines[j] = tuple(lines[j])
+            rows[i] = rows[i] + (lines,)
+        
         return rows
 
     """
@@ -67,8 +116,8 @@ class DBConnector:
         return rows[0][0]
 
     """
-            Metodo che effettua la query per estrarre l'ultima data del DB.
-            MAX perchè è la data più recente di tutto il DB.
+        Metodo che effettua la query per estrarre l'ultima data del DB.
+        MAX perchè è la data più recente di tutto il DB.
     """
     def extractLastDay(self):
         cursor = self.__mydb.cursor()

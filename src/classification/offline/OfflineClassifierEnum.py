@@ -14,3 +14,4 @@ class OfflineClassifierEnum(Enum):
     OfflinePerceptron = 2
     OfflineRandomForest = 3
     OfflineDecisionTree = 4
+    OfflineXGBoost = 5

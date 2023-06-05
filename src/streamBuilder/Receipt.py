@@ -1,11 +1,10 @@
 """
 // Name        : Receipt.py
-// Author      : Andrea Brunetta, Francesco Luce
-// Version     : 3.0
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 4.0
 // Description : La classe Receipt modella la singola entry della tabella Receipt del DB.
                  Essa contiene tutti i campi della tabella Receipt come attributi e relativi metodi get e set.
 """
-
 
 class Receipt:
 
@@ -16,15 +15,17 @@ class Receipt:
             - Quantity: quantità del prodotto acquistato, di tipo int;
             - Q_Amount: prezzo totale, di tipo float;
             - Q_Discount_Amount: sconto totale, di tipo int, al momento non trattato;
-            - T_Receipt: Data e orario dell'acquisto.
+            - T_Receipt: Data e orario dell'acquisto;
+            - lines: Receipt lines che formano la ricevuta.
     """
-    def __init__(self, K_Receipt, K_Member, Quantity, Q_Amount, Q_Discount_Amount, T_Receipt):
+    def __init__(self, K_Receipt, K_Member, Quantity, Q_Amount, Q_Discount_Amount, T_Receipt, lines):
         self.__K_Receipt = K_Receipt
         self.__K_Member = K_Member
         self.__Quantity = Quantity
         self.__Q_Amount = Q_Amount
         self.__Q_Discount_Amount = Q_Discount_Amount
         self.__T_Receipt = T_Receipt
+        self.__lines = lines
 
     """
         Metodo getter attributo K_Receipt.
@@ -67,3 +68,29 @@ class Receipt:
     """
     def getTReceipt(self):
         return self.__T_Receipt
+    
+    """
+        Metodo getter attributo lines.
+        Return di un tipo lista di ReceiptLine.
+    """
+    def getLines(self):
+        return self.__lines
+    
+    """
+        Metodo finalizzato ad ottenere un dizionario delle categorie della ricevuta con il corrispettivo QAmount.
+        Return di un dizionario.
+    """
+    def getInfoCategories(self, categories):
+        # creazione di un dizionario per mantenere la somma delle qamount per ogni categoria
+        categories_count = {}
+
+        for line in self.__lines:
+            categories_list = line.getCategories()
+            q_amount = line.getQAmount()
+            for category in categories_list:
+                categories_count.setdefault(category, 0)
+                categories_count[category] += q_amount
+
+        info_categories = {category: categories_count.get(category, 0) for category in categories}
+
+        return info_categories

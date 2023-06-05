@@ -19,7 +19,7 @@ class OfflineRandomForest(OfflineClassifierInterface):
         Richiama il costruttore di linear_model.RandomForestClassifier()
     """
     def __init__(self):
-        self.__model = ensemble.RandomForestClassifier()
+        self.__model = ensemble.RandomForestClassifier(random_state=42)
 
     """
         Metodo learn che prende in input:
@@ -28,6 +28,7 @@ class OfflineRandomForest(OfflineClassifierInterface):
         richiama il fit di RandomForest
     """
     def learn(self, x: np.ndarray, y: np.ndarray):
+        self.__model.set_params(class_weight={0: len(y)/(2 * sum(y == 0)), 1: len(y)/(2 * sum(y == 1))})
         self.__model = self.__model.fit(x, y)
         return self
 
