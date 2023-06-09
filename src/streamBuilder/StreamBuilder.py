@@ -62,7 +62,8 @@ class StreamBuilder:
         except mysql.connector.errors.ProgrammingError:
             raise ValueError("Connessione al db fallita, controllare che i parametri siano corretti")
 
-        if set([traditionalRFM, aggregates, productRFM, productAggregates]) != {0, 1}:
+        allowed_values = [0, 1]
+        if all(value not in allowed_values for value in [traditionalRFM, aggregates, productRFM, productAggregates]):
             raise ValueError("I valori delle features devono essere 0 o 1!")
 
         self.__window: DataWindow = DataWindow(periodDim, periods, churnDim, traditionalRFM, aggregates, productRFM, productAggregates)
@@ -71,7 +72,6 @@ class StreamBuilder:
     """
         Metodo per la generazione ed etichettatura di esempi. Infine serializziamo gli esempi in un pickle.
     """
-
     def __generateStream(self, start: str, end: str, level: int):
         currentDay = self.__mydb.extractFirstDay() if start is None else dt.date.fromisoformat(start)
         lastDay = self.__mydb.extractLastDay() if end is None else dt.date.fromisoformat(end)
