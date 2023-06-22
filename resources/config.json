@@ -29,7 +29,7 @@
     },
     "level": {
         "value": 2,
-        "description": "Livello di gerarchia delle categorie da utilizzare."
+        "description": "livello di gerarchia delle categorie da utilizzare, di tipo int;"
     },
     "traditionalRFM": {
         "value": 1,
@@ -49,10 +49,10 @@
     },
     "start": {
         "value": null,
-        "description": "Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db."
+        "description": "Data di partenza in formato: AAAA-MM-DD, OPZIONALE: di default la prima del db. Inserire 'null' se non si vuole considerare."
     },
     "end": {
         "value": null,
-        "description": "Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l'ultima del db."
+        "description": "Data di fine in formato: AAAA-MM-DD, OPZIONALE: di default l'ultima del db. Inserire 'null' se non si vuole considerare."
     }
 }
