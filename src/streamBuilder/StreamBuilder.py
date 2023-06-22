@@ -34,6 +34,11 @@ class StreamBuilder:
             - churnDim: dimensione del churn, di tipo int;
             - periodDim: dimensione del periodo, di tipo int;
             - periods: numero di periodi, di tipo int;
+            - level: livello di gerarchia delle categorie da utilizzare, di tipo int;
+            - traditionalRFM: Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No);
+            - aggregates: Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No);
+            - productRFM: Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No);
+            - productAggregates: Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No);
             - start: data di partenza, di default la prima del db;
             - end: data di fine, di default l'ultima del db;
             - outputFolder: percorso della cartella output dove vengono salvati i pickle;
@@ -136,7 +141,7 @@ parser.add_argument('--database', help='Il nome del database a cui si desidera c
 parser.add_argument('--churnDim', help='Dimensione del churn, di tipo int.', type=int)
 parser.add_argument('--periodDim', help='Dimensione del periodo, di tipo int.', type=int)
 parser.add_argument('--periods', help='Numero di periodi, di tipo int.', type=int)
-parser.add_argument('--level', help='Livello di gerarchia delle categorie da utilizzare.', type=int)
+parser.add_argument('--level', help='livello di gerarchia delle categorie da utilizzare, di tipo int;', type=int)
 parser.add_argument('--traditionalRFM', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
 parser.add_argument('--aggregates', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
 parser.add_argument('--productRFM', help='Valore binario per stabilire se considerare o meno queste feature (1 - Sì, 0 - No).', type=int)
