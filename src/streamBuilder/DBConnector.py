@@ -45,6 +45,10 @@ class DBConnector:
     def closeConnection(self):
         self.__mydb.close()
 
+    """
+        Metodo che estrae la gerarchia di prodotti dal database e la inserisce in un dizionario
+        con chiave padre e valore lista di figli.
+    """
     def extractProductHierarchy(self, level):
         mapping = {}
         hierarchy = {}
