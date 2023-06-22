@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scikitplot as skplt
 import argparse
+import datetime
 
 from sklearn.metrics import accuracy_score, classification_report
 from src.classification.online.OnlineLearner import OnlineLearner
@@ -26,8 +27,8 @@ class Main:
         Metodo costruttore. Richiama il metodo main di Main.
     """
 
-    def __init__(self, start: str, end: str, serialized: str):
-        self.__main(start, end, serialized)
+    def __init__(self, start: str, end: str, serialized: str, training_dim: int):
+        self.__main(start, end, serialized, training_dim)
 
     """
         Metodo printReport per la stampa di matrice di confusione e diversi score.
@@ -48,7 +49,9 @@ class Main:
         richiama un metodo per la stampa dei risultati
     """
 
-    def __main(self, start: str, end: str, serialized: str):
+    def __main(self, start: str, end: str, serialized: str, training_dim: int):
+        if training_dim < 0 or training_dim > 99:
+            raise ValueError("Il parametro training_dim deve avere valore compreso tra 0 e 99!")
         # Carichiamo un modello precedentemente serializzato
         if serialized:
             file_path = os.path.join(self.MODELSFOLDERPATH, serialized)
@@ -76,8 +79,15 @@ class Main:
             except ValueError:
                 print("Uno dei file di inizio o di fine non è presente all'interno della cartella, ")
 
-        # Stabiliamo percentuale Train Set
-        train_percentage = int((len(files) * 70) / 100)
+        if training_dim == 0:
+            # Un anno di training set
+            date_obj = datetime.datetime.strptime(files[0], '%Y-%m-%d')
+            new_date_obj = date_obj.replace(year=date_obj.year + 1)
+            new_date_str = datetime.datetime.strftime(new_date_obj, '%Y-%m-%d')
+            train_percentage = files.index(new_date_str)
+        else:
+            # Stabiliamo percentuale Train Set
+            train_percentage = int((len(files) * training_dim) / 100)
 
         # loader per il train che va da start a 70% (esempio) dove start può essere passato in input
         train_loader = PickleLoader(self.STREAMFOLDERPATH, files, start=files[0], end=files[train_percentage])
@@ -110,8 +120,11 @@ parser.add_argument('--end',
 parser.add_argument('--serialized',
                     help='Nome del file da caricare che contiene il modello precedentemente addestrato e serializzato',
                     default=None)
+parser.add_argument('--training_dim',
+                    help='Valore intero da 1 a 99 per selezionare la dimensione del training set. Per selezionare un anno esatto di training set inserire 0. Il valore di default è 70.)',
+                    default=70)
 args = parser.parse_args()
 try:
-    Main(args.start, args.end, args.serialized)
+    Main(args.start, args.end, args.serialized, args.training_dim)
 except ValueError as err:
     print('\033[91m' + str(err))
