@@ -122,7 +122,7 @@ parser.add_argument('--serialized',
                     default=None)
 parser.add_argument('--training_dim',
                     help='Valore intero da 1 a 99 per selezionare la dimensione del training set. Per selezionare un anno esatto di training set inserire 0. Il valore di default è 70.)',
-                    default=70)
+                    type=int, default=70)
 args = parser.parse_args()
 try:
     Main(args.start, args.end, args.serialized, args.training_dim)
