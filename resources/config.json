@@ -13,7 +13,7 @@
     },
     "database": {
         "value": "brazilian_churn_retail_db_verfour",
-        "description": "Il nome del database a cui si desidera connettersi ed eseguire le operazioni"
+        "description": "Il nome del database a cui si desidera connettersi ed eseguire le operazioni."
     },
     "churnDim": {
         "value": 120,
@@ -29,7 +29,7 @@
     },
     "level": {
         "value": 2,
-        "description": "livello di gerarchia delle categorie da utilizzare, di tipo int;"
+        "description": "Livello di gerarchia delle categorie da utilizzare, di tipo int."
     },
     "traditionalRFM": {
         "value": 1,
