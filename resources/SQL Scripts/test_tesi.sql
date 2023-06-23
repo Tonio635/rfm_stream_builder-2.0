@@ -6,13 +6,13 @@ USE `test_tesi`;
 DROP TABLE IF EXISTS `receipts`;
 
 CREATE TABLE `receipts` (
-  `K_Receipt` varchar(100) NOT NULL,
-  `K_Member` varchar(100) NOT NULL,
-  `Quantity` int DEFAULT NULL,
-  `Q_Amount` decimal(20,2) DEFAULT NULL,
-  `Q_Discount_Amount` int DEFAULT NULL,
-  `T_Receipt` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`K_Receipt`)
+    `K_Receipt` varchar(100) NOT NULL,
+    `K_Member` varchar(100) NOT NULL,
+    `Quantity` int DEFAULT NULL,
+    `Q_Amount` decimal(20,2) DEFAULT NULL,
+    `Q_Discount_Amount` int DEFAULT NULL,
+    `T_Receipt` timestamp NULL DEFAULT NULL,
+    PRIMARY KEY (`K_Receipt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `receipts` WRITE;
@@ -22,9 +22,9 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `product_types`;
 
 CREATE TABLE `product_types` (
-  `K_Product_Type` varchar(100) NOT NULL,
-  `N_Level` int DEFAULT NULL,
-  PRIMARY KEY (`K_Product_Type`)
+    `K_Product_Type` varchar(100) NOT NULL,
+    `N_Level` int DEFAULT NULL,
+    PRIMARY KEY (`K_Product_Type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `product_types` WRITE;
@@ -34,11 +34,11 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `products`;
 
 CREATE TABLE `products` (
-  `K_Product` varchar(100) NOT NULL,
-  `K_Product_Type` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`K_Product`),
-  KEY `K_Product_Type` (`K_Product_Type`),
-  CONSTRAINT `products_ibfk_1` FOREIGN KEY (`K_Product_Type`) REFERENCES `product_types` (`K_Product_Type`)
+    `K_Product` varchar(100) NOT NULL,
+    `K_Product_Type` varchar(100) DEFAULT NULL,
+    PRIMARY KEY (`K_Product`),
+    KEY `K_Product_Type` (`K_Product_Type`),
+    CONSTRAINT `products_ibfk_1` FOREIGN KEY (`K_Product_Type`) REFERENCES `product_types` (`K_Product_Type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `products` WRITE;
@@ -48,34 +48,34 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `receipt_lines`;
 
 CREATE TABLE `receipt_lines` (
-  `K_Receipt_Line` int NOT NULL AUTO_INCREMENT,
-  `K_Receipt` varchar(100) NOT NULL,
-  `K_Product` varchar(100) NOT NULL,
-  `Quantity` int DEFAULT NULL,
-  `Q_Amount` decimal(20,2) DEFAULT NULL,
-  `Q_Discount_Amount` int DEFAULT NULL,
-  PRIMARY KEY (`K_Receipt_Line`),
-  KEY `K_Receipt` (`K_Receipt`),
-  KEY `K_Product` (`K_Product`),
-  CONSTRAINT `receipt_lines_ibfk_1` FOREIGN KEY (`K_Receipt`) REFERENCES `receipts` (`K_Receipt`),
-  CONSTRAINT `receipt_lines_ibfk_2` FOREIGN KEY (`K_Product`) REFERENCES `products` (`K_Product`)
+    `K_Receipt_Line` int NOT NULL AUTO_INCREMENT,
+    `K_Receipt` varchar(100) NOT NULL,
+    `K_Product` varchar(100) NOT NULL,
+    `Quantity` int DEFAULT NULL,
+    `Q_Amount` decimal(20,2) DEFAULT NULL,
+    `Q_Discount_Amount` int DEFAULT NULL,
+    PRIMARY KEY (`K_Receipt_Line`),
+    KEY `K_Receipt` (`K_Receipt`),
+    KEY `K_Product` (`K_Product`),
+    CONSTRAINT `receipt_lines_ibfk_1` FOREIGN KEY (`K_Receipt`) REFERENCES `receipts` (`K_Receipt`),
+    CONSTRAINT `receipt_lines_ibfk_2` FOREIGN KEY (`K_Product`) REFERENCES `products` (`K_Product`)
 ) ENGINE=InnoDB AUTO_INCREMENT=112651 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `receipt_lines` WRITE;
-INSERT INTO `receipt_lines` VALUES (1,'1','P1',1,10.00,NULL), (2,'1','P3',1,5.53,NULL), (3,'1','P2',1,5.00,NULL), (4,'2','P4',2,26.00,NULL), (5,'3','P1',1,2.99,NULL), (6,'3','P5',1,3,NULL), (7,'4','P2',1,4.70,NULL), (8,'4','P4',1,4.00,NULL), (9,'5','P3',1,35.67,NULL);
+INSERT INTO `receipt_lines` VALUES (1,'1','P1',1,10.00,NULL), (2,'1','P3',1,5.53,NULL), (3,'1','P2',1,5.00,NULL), (4,'2','P4',1,52.00,NULL), (5,'3','P1',1,2.99,NULL), (6,'3','P5',1,3,NULL), (7,'4','P2',1,4.70,NULL), (8,'4','P4',1,4.00,NULL), (9,'5','P3',1,35.67,NULL);
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `product_hierarchies`;
 
 CREATE TABLE `product_hierarchies` (
-  `K_Product_Hierarchy` varchar(100) NOT NULL,
-  `K_Product_Parent` varchar(100) NOT NULL,
-  `K_Product_Child` varchar(100) NOT NULL,
-  PRIMARY KEY (`K_Product_Hierarchy`),
-  KEY `K_Product_Parent` (`K_Product_Parent`),
-  KEY `K_Product_Child` (`K_Product_Child`),
-  CONSTRAINT `product_hierarchies_ibfk_1` FOREIGN KEY (`K_Product_Parent`) REFERENCES `products` (`K_Product`),
-  CONSTRAINT `product_hierarchies_ibfk_2` FOREIGN KEY (`K_Product_Child`) REFERENCES `products` (`K_Product`)
+    `K_Product_Hierarchy` varchar(100) NOT NULL,
+    `K_Product_Parent` varchar(100) NOT NULL,
+    `K_Product_Child` varchar(100) NOT NULL,
+    PRIMARY KEY (`K_Product_Hierarchy`),
+    KEY `K_Product_Parent` (`K_Product_Parent`),
+    KEY `K_Product_Child` (`K_Product_Child`),
+    CONSTRAINT `product_hierarchies_ibfk_1` FOREIGN KEY (`K_Product_Parent`) REFERENCES `products` (`K_Product`),
+    CONSTRAINT `product_hierarchies_ibfk_2` FOREIGN KEY (`K_Product_Child`) REFERENCES `products` (`K_Product`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 LOCK TABLES `product_hierarchies` WRITE;
