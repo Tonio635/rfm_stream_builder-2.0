@@ -131,27 +131,30 @@ class DataWindow:
             windows = [cw for cw in self.__window.values()
                        if (self.__currentDay - cw.getLastReceipt().date()).days < self.__churnDim]
             for cw in windows:
-                recencys = {key: -1 for key in categories}
                 rfm = Rfm(0, 0, 0)
                 periods = self.__splitPeriods(cw)
                 ex = Example(self.__currentDay)
 
-                recencyPeriod = [periods[-2][-1]] + periods[-1][:-1] if len(periods) > 1 else [None] + periods[-1][:-1]
+                if self.__productAggregates == 1 or self.__productRFM == 1:
+                    recencys = {key: -1 for key in categories}
+                    recencyPeriod = [periods[-2][-1]] + periods[-1][:-1] if len(periods) > 1 else [None] + periods[-1][:-1]
 
-                for day in recencyPeriod:
-                    categoriesBought = day.getCategoriesBought() if day is not None else set()
-                    for key in recencys.keys():
-                        if key in categoriesBought:
-                            recencys[key] = 0
-                        elif recencys[key] != -1:
-                            recencys[key] += 1
+                    for day in recencyPeriod:
+                        categoriesBought = day.getCategoriesBought() if day is not None else set()
+                        for key in recencys.keys():
+                            if key in categoriesBought:
+                                recencys[key] = 0
+                            elif recencys[key] != -1:
+                                recencys[key] += 1
 
                 for period in periods:
+                    if self.__traditionalRFM == 1 or self.__aggregates == 1:    
+                        rfm = self.__calculateRFM(period)
+                        ex.addRfm(rfm)
+                    if self.__productAggregates == 1 or self.__productRFM == 1:
+                        productRfm = self.__calculateProductRFM(period, categories)
+                        ex.addProductRfm(productRfm)
                     
-                    rfm = self.__calculateRFM(period)
-                    productRfm = self.__calculateProductRFM(period, categories)
-                    ex.addRfm(rfm)
-                    ex.addProductRfm(productRfm)
                 # Inserisce l'esempio in ExampleDictionary. Esso è formato dai k (con k=periods) RFM calcolati.
                 self.__examples.insertExample(cw.getKMember(), ex)
                 # Verifica se il cliente attuale ha acquistato nel currentDay
@@ -175,31 +178,34 @@ class DataWindow:
                         remainingReceipts = receipts[1:].copy()
 
                         for receipt in receipts[1:]:
-                            rfm = Rfm(rfm.getRecency(), rfm.getFrequency() - 1, rfm.getMonetary() - oldMonetary)
-                            productsRfm = []
-                            for i in range(len(categories)):
-                                recency = -1
-                                for ricevuta in remainingReceipts:
-                                    if ricevuta.getInfoCategories(categories)[categories[i]] != 0:
-                                        recency = 0
-                                        break
-                                
-                                if recencys[categories[i]] != -1 and recency == -1:
-                                    recency = recencys[categories[i]] + 1
-                                
-                                frequency = productRfm[i].getFrequency() - 1 if categories[i] in oldReceiptCategories else productRfm[i].getFrequency()
-                                monetary = productRfm[i].getMonetary() - Decimal(oldProductMonetary[categories[i]])
-                                productsRfm.append(Rfm(recency, frequency, monetary))
-                            
-                            remainingReceipts.pop(0)
                             newExample = ex.copy()
-                            newExample.replaceLastRfm(rfm)
-                            newExample.replaceLastProductRfm(productsRfm)
-                            newExample.setLabelTimestamp(receipt.getTReceipt())
+                            if self.__traditionalRFM == 1 or self.__aggregates == 1:
+                                rfm = Rfm(rfm.getRecency(), rfm.getFrequency() - 1, rfm.getMonetary() - oldMonetary)
+                                newExample.replaceLastRfm(rfm)
+                                newExample.setLabelTimestamp(receipt.getTReceipt())
+                                oldMonetary = receipt.getQAmount()
+                            if self.__productAggregates == 1 or self.__productRFM == 1:
+                                productsRfm = []
+                                for i in range(len(categories)):
+                                    recency = -1
+                                    for ricevuta in remainingReceipts:
+                                        if ricevuta.getInfoCategories(categories)[categories[i]] != 0:
+                                            recency = 0
+                                            break
+                                    
+                                    if recencys[categories[i]] != -1 and recency == -1:
+                                        recency = recencys[categories[i]] + 1
+                                    
+                                    frequency = productRfm[i].getFrequency() - 1 if categories[i] in oldReceiptCategories else productRfm[i].getFrequency()
+                                    monetary = productRfm[i].getMonetary() - Decimal(oldProductMonetary[categories[i]])
+                                    productsRfm.append(Rfm(recency, frequency, monetary))
+                                
+                                remainingReceipts.pop(0)
+                                oldProductMonetary = receipt.getInfoCategories(categories)
+                                oldReceiptCategories = set(category for line in receipt.getLines() for category in line.getCategories())
+                                newExample.replaceLastProductRfm(productsRfm)
+                            
                             seq.appendExample(newExample.copy())
-                            oldMonetary = receipt.getQAmount()
-                            oldProductMonetary = receipt.getInfoCategories(categories)
-                            oldReceiptCategories = set(category for line in receipt.getLines() for category in line.getCategories())
 
                         # Etichettatura a False degli esempi costruiti per questa casistica
                         seq.record(False, toFill, self.__traditionalRFM, self.__aggregates, self.__productRFM, self.__productAggregates)
