@@ -67,8 +67,7 @@ class StreamBuilder:
         except mysql.connector.errors.ProgrammingError:
             raise ValueError("Connessione al db fallita, controllare che i parametri siano corretti")
 
-        allowed_values = [0, 1]
-        if all(value not in allowed_values for value in [traditionalRFM, aggregates, productRFM, productAggregates]):
+        if all(value not in [0, 1] for value in [traditionalRFM, aggregates, productRFM, productAggregates]):
             raise ValueError("I valori delle features devono essere 0 o 1!")
 
         self.__window: DataWindow = DataWindow(periodDim, periods, churnDim, traditionalRFM, aggregates, productRFM, productAggregates)
