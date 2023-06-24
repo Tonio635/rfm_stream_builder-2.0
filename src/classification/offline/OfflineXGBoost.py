@@ -1,3 +1,14 @@
+"""
+// Name        : OfflineXGBoost.py
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 1.0
+// Description : Classe concreta OfflineRandomForest che implementa i metodi:
+                    - learn_many(x: pd.DataFrame, y: pd.Series);
+                    - predict_many(x: pd.DataFrame);
+                 Eredita da OfflineClassifierInterface
+"""
+
+
 import numpy as np
 
 from xgboost import XGBClassifier

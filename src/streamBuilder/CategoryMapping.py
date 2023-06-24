@@ -1,3 +1,10 @@
+"""
+// Name        : CategoryMapping.py
+// Author      : Antonio Giuseppe Doronzo
+// Version     : 1.0
+// Description : Classe che modella il mapping delle categorie.
+"""
+
 from ordered_set import OrderedSet
 
 class CategoryMapping:

@@ -1,7 +1,7 @@
 """
 // Name        : StreamBuilder.py
-// Author      : Andrea Brunetta, Francesco Luce
-// Version     : 3.0
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 4.0
 // Description : Classe centrale del nostro progetto. Ha il compito di avviare il ciclo di estrazione dei dati dal db,
                  attraverso l'inizializzazione di una connessione usando la classe DBConnector. Viene successivamente
                  aperto il file csv su cui serializziamo gli esempi.

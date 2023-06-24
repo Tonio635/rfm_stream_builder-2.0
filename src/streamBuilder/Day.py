@@ -1,7 +1,7 @@
 """
 // Name        : Day.py
-// Author      : Andrea Brunetta, Francesco Luce
-// Version     : 3.0
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 4.0
 // Description : La classe Day modella l'insieme di ricevute di un dato cliente raccolte in una specifica giornata.
                  Un Day è dunque una collezione di Receipts.
 """

@@ -1,7 +1,7 @@
 """
 // Name        : OfflineClassifierEnum.py
-// Author      : Andrea Brunetta, Francesco Luce
-// Version     : 3.0
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 4.0
 // Description : Classe per l'enumerazione.
 """
 

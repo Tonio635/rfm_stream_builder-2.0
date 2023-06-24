@@ -6,7 +6,7 @@
                  RFM è un modello utilizzato per analizzare il valore del cliente.
                  Con questa tecnica non facciamo altro che classificare gli acquirenti, usando come criterio lo storico
                  delle transazioni: quando (recency), quante volte (frequency) e quanto (monetary) hanno acquistato
-                 nell’arco temporale considerato.
+                 nell'arco temporale considerato.
 """
 
 

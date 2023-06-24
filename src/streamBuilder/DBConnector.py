@@ -1,7 +1,7 @@
 """
 // Name        : DBConnector.py
-// Author      : Andrea Brunetta, Francesco Luce
-// Version     : 3.0
+// Author      : Andrea Brunetta, Francesco Luce, Antonio Giuseppe Doronzo
+// Version     : 4.0
 // Description : La classe DBConnector modella la connessione al DB.
                  Modulo MySQL Connector Python. Questa classe sviluppa e integra 
                  il nostro progetto Python con un server di database MySQL.
