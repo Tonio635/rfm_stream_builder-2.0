@@ -157,6 +157,7 @@ Esempio di input:
 * Due versioni del database UCI: La prima versione, chiamata churn_retail_db, è quella originale, la seconda è quella che include le categorie di prodotti con 3 livelli di gerarchia. Solo la seconda è pienamente compatibile con questa nuova versione;
 * Due versioni di test: Una è chiamata test_tesi e riprende l'esempio illustrato nel capitolo 4. L'altra versione, chiamata test_db, è un altro database di test non compatibile con le novità introdotte.
 
+I database usati per le sperimentazioni sono **brazilian_churn_retail_db_verfour** e **churn_retail_db_vertwo**.
 ## Addestramento e Classificazione
 
 Dopo aver serializzato gli esempi nella cartella output, i file verranno caricati dal programma di addestramento e classificazione.
