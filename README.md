@@ -46,6 +46,7 @@ I datasets utilizzati sono reperibili ai seguenti link:
         │         ├ ExampleDictionary.py
         │         ├ ExampleSequence.py
         │         ├ Receipt.py
+        │         ├ ReceiptLine.py
         │         ├ Rfm.py
         │         ├ RfmR.py
         │         └ StreamBuilder.py 
