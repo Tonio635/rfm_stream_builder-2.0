@@ -109,12 +109,12 @@ I datasets utilizzati sono reperibili ai seguenti link:
 
     pip install -r /path/to/requirements.txt
 
-**Python  3.10**
+**Python  3.11**
 
 Packages:
 
-* [Matplotlib 3.6.1](https://matplotlib.org/)
-* [Numpy 1.23.4](https://www.numpy.org/)
+* [Matplotlib 3.7.1](https://matplotlib.org/)
+* [Numpy 1.25.0](https://www.numpy.org/)
 * [Scikit-learn 1.1.3](https://scikit-learn.org/stable/)
 * [Pandas 1.5.1](https://pandas.pydata.org/)
 * [Mysql-connector 8.0.31](https://pypi.org/project/mysql-connector-python/)
