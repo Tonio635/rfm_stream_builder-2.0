@@ -189,4 +189,41 @@ Il nostro programma presenta anche la funzione di caricamento del modello serial
 
     --serialized "nome_file"
 
+## Categorie Brazilian
+Per il dataset Brazilian esistono 4 livelli nella gerarchia:
+* **Livello 1**: La radice. Racchiude tutte quante le categorie e, selezionandolo, ogni prodotto sarà considerato di un'unica categoria;
+* **Livello 2**: 15 categorie che si occupano di raggruppare le categorie di livello 3, al fine di ridurle;
+* **Livello 3**: 74 categorie originarie del dataset che raggruppano tutti quanti i prodotti;
+* **Livello 4**: I prodotti stessi. Selezionando questo livello non si prenderanno più in considerazione le categorie ma direttamente i singoli prodotti. Risulteranno quindi 33041 RFM dei prodotti e aggregati dei prodotti.
 
+Di seguito sono mostrate le cateogire di livello 2 con tutte le categorie di livello 3 che esse racchiudono:
+
+* **musica_e_arte**: *instrumentos_musicais, artes, audio, musica, cds_dvds_musicais;*
+* **svago**: *artes, cool_stuff, brinquedos, fashion_calcados, consoles_games, livros_interesse_geral, fashion_underwear_e_moda_praia, livros_tecnicos, market_place, audio, musica, livros_importados, dvds_blu_ray,artes_e_artesanato, pc_gamer, cine_foto, flores, cds_dvds_musicais;*
+* **bambini**: *bebes, brinquedos, fraldas_higiene;*
+* **casa_e_giardino**: *utilidades_domesticas, moveis_decoracao, eletrodomesticos, cama_mesa_banho, ferramentas_jardim, climatizacao, eletrodomesticos_2, la_cuisine, construcao_ferramentas_jardim, casa_conforto,portateis_casa_forno_e_cafe, moveis_quarto, casa_conforto_2, portateis_cozinha_e_preparadores_de_alimentos, moveis_colchao_e_estofado;*
+* **costruzione**: *construcao_ferramentas_seguranca, casa_construcao, construcao_ferramentas_construcao, construcao_ferramentas_ferramentas, construcao_ferramentas_iluminacao;*
+* **computer_ed_elettronica**: *eletrodomesticos, informatica_acessorios, eletronicos, pcs, climatizacao, consoles_games, telefonia_fixa, eletrodomesticos_2, tablets_impressao_imagem, pc_gamer;*
+* **prodotti_di_bellezza**: *perfumaria, beleza_saude;*
+* **abbigliamento**: *malas_acessorios, fashion_calcados, fashion_bolsas_e_acessorios, fashion_underwear_e_moda_praia,fashion_roupa_masculina, fashion_roupa_feminina, fashion_esporte, fashion_roupa_infanto_juvenil;*
+* **arredamento**: *moveis_decoracao, cama_mesa_banho, moveis_escritorio, moveis_sala, moveis_cozinha_area_de_servico_jantar_e_jardim, la_cuisine, portateis_casa_forno_e_cafe, moveis_quarto, portateis_cozinha_e_preparadores_de_alimentos, moveis_colchao_e_estofado;*
+* **automotive**: *automotivo;*
+* **lavoro**: *moveis_escritorio, papelaria, agro_industria_e_comercio, construcao_ferramentas_ferramentas, industria_comercio_e_negocios, livros_tecnicos, market_place, livros_importados, dvds_blu_ray;*
+* **animali**: *pet_shop;*
+* **sicurezza**: *sinalizacao_e_seguranca, seguros_e_servicos;*
+* **alimenti**: *portateis_cozinha_e_preparadores_de_alimento, alimentos, alimentos_bebidas, bebidas;*
+* **eventi_speciali**: *perfumaria, brinquedos, relogios_presentes, consoles_games, artigos_de_festas, audio, musica, artigos_de_natal, flores, cds_dvds_musicais.*
+
+Si può notare che le categorie di livello 3 sono in portoghese. Questo perché era presente già inizialmente una categorizzazione preliminare dei prodotti, che in questo lavoro è stata riprogettata e riorganizzata. 
+È anche da notare che ogni prodotto può essere presente in più categorie e che quindi non esiste nessun vincolo che lega un prodotto ad una ed una sola categoria. La stessa cosa vale per le varie categorie verso categorie di un livello superiore. 
+## Categorie UCI
+Per il dataset UCI esistono 3 livelli nella gerarchia:
+
+* **Livello 1**: La radice. Racchiude tutte quante le categorie e, selezionandolo, ogni prodotto sarà considerato di un'unica categoria;
+* **Livello 2**: 16 categorie che raggruppano tutti quanti i prodotti;
+* **Livello 3**: I prodotti stessi. Selezionando questo livello non si prenderanno più in considerazione le categorie ma direttamente i singoli prodotti. Risulteranno quindi 4620 RFM dei prodotti e aggregati dei prodotti.
+
+Le categorie di livello 2 solo le seguenti: *HOUSE_AND_GARDEN, ENTERTAINMENT, STATIONERY, PET, UTILITIES, SET, VINTAGE, CLOTHING, KITCHEN, KIDS, ELECTRONIC, PHOTO_AND_VIDEOS, ART_AND_MUSIC, SPECIAL_EVENTS, HYGIENE_AND_BEAUTY_PRODUCTS, FOOD_AND_DRINK.*
+
+In questo caso, inizialmente, non era presente una categorizzazione, quindi è stato necessario crearla da zero studiando tutti i prodotti del dataset. 
+Anche in questo caso ogni prodotto può essere presente in più categorie e senza nessun vincolo che lo leghi ad una ed una sola categoria.
