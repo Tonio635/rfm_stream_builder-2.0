@@ -109,7 +109,7 @@ I datasets utilizzati sono reperibili ai seguenti link:
 
     pip install -r /path/to/requirements.txt
 
-**Python  3.11**
+**Python 3.11**
 
 Packages:
 
@@ -120,6 +120,7 @@ Packages:
 * [Mysql-connector 8.0.31](https://pypi.org/project/mysql-connector-python/)
 * [Seaborn 0.12.1](https://seaborn.pydata.org/)
 * [River 0.14.0](https://riverml.xyz/0.14.0/)
+* [XGBoost 1.7.5](https://xgboost.ai/)
 
 
 
